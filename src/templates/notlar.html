@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Notlar{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="text-white mb-3">Notlarım</h4>
+
+  <form method="POST" action="/notlar">
+    <textarea name="metin" class="form-control mb-3" rows="16"
+              placeholder="Notlarını buraya yaz...">{{ metin }}</textarea>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+  </form>
+</div>
+{% endblock %}

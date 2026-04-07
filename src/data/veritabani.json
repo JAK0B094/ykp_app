@@ -2,7 +2,33 @@
     "kullanicilar": {
         "ykp": {
             "sifre": "949494",
-            "eposta": "yakup.picak@gmail.com"
+            "eposta": "yakup.picak@gmail.com",
+            "gorevler": [
+                {
+                    "id": "182189f3",
+                    "baslik": "Test görevi",
+                    "tamamlandi": false,
+                    "tarih": "2026-04-07"
+                }
+            ],
+            "fitness_profil": {
+                "boy": 180.0,
+                "kilo": 82.0,
+                "yas": 28,
+                "cinsiyet": "Erkek",
+                "aktivite": "Orta Aktif (3-5 gün/hafta)",
+                "hedef": "Kas Yap",
+                "seviye": "Başlangıç",
+                "baslangic_tarihi": ""
+            },
+            "fitness_gecmisi": [
+                {
+                    "tarih": "2026-04-07",
+                    "kilo": 82.0,
+                    "vki": 25.3,
+                    "hedef_kalori": 3106
+                }
+            ]
         }
     }
 }

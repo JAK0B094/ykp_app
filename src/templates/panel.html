@@ -3,7 +3,60 @@
 
 {% block content %}
 <div class="container py-4">
-  <h2 class="fw-bold text-white">Hoş geldin, {{ kullanici }}! 👋</h2>
-  <p class="text-muted">Panel yakında hazır olacak.</p>
+  <h4 class="text-white mb-4">Hoş geldin, <strong>{{ kullanici }}</strong>!</h4>
+
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark text-white border-secondary h-100">
+        <div class="card-body">
+          <div class="small text-muted">Görevler</div>
+          <div class="fs-3 fw-bold">{{ gorev_toplam }}</div>
+          <div class="small text-muted">{{ gorev_tamamlandi }} tamamlandı</div>
+          <a href="/gorevler" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark text-white border-secondary h-100">
+        <div class="card-body">
+          <div class="small text-muted">Son Kilo</div>
+          <div class="fs-3 fw-bold">{{ son_kilo or "—" }}</div>
+          <div class="small text-muted">{{ son_vki or "" }}</div>
+          <a href="/fitness" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark text-white border-secondary h-100">
+        <div class="card-body">
+          <div class="small text-muted">Fitness Kayıt</div>
+          <div class="fs-3 fw-bold">{{ fitness_kayit }}</div>
+          <div class="small text-muted">toplam</div>
+          <a href="/fitness" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark text-white border-secondary h-100">
+        <div class="card-body">
+          <div class="small text-muted">Notlar</div>
+          <div class="small text-white mt-1" style="overflow:hidden;max-height:48px">
+            {{ not_ozet or "Henüz not yok." }}
+          </div>
+          <a href="/notlar" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex flex-wrap gap-2">
+    <a href="/fitness"  class="btn btn-outline-light btn-sm">Fitness Koçu</a>
+    <a href="/gorevler" class="btn btn-outline-light btn-sm">Görevlerim</a>
+    <a href="/notlar"   class="btn btn-outline-light btn-sm">Notlarım</a>
+    <a href="/profil"   class="btn btn-outline-light btn-sm">Profilim</a>
+  </div>
 </div>
 {% endblock %}

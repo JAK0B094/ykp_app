@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Fitness Koçu{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h4 class="text-white mb-3">Fitness Koçu</h4>
+
+  {% if hata %}
+  <div class="alert alert-danger">{{ hata }}</div>
+  {% endif %}
+
+  <form method="POST" action="/fitness">
+    <div class="row g-2 mb-3">
+      <div class="col-6 col-md-3">
+        <label class="form-label text-muted small">Boy (cm)</label>
+        <input type="number" name="boy" class="form-control" step="0.1"
+               value="{{ profil.boy or '' }}" placeholder="175" required>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-muted small">Kilo (kg)</label>
+        <input type="number" name="kilo" class="form-control" step="0.1"
+               value="{{ profil.kilo or '' }}" placeholder="75" required>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-muted small">Yaş</label>
+        <input type="number" name="yas" class="form-control"
+               value="{{ profil.yas or '' }}" placeholder="25" required>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-muted small">Cinsiyet</label>
+        <select name="cinsiyet" class="form-select">
+          <option value="Erkek" {% if profil.cinsiyet == 'Erkek' %}selected{% endif %}>Erkek</option>
+          <option value="Kadın" {% if profil.cinsiyet == 'Kadın' %}selected{% endif %}>Kadın</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label text-muted small">Aktivite Seviyesi</label>
+        <select name="aktivite" class="form-select">
+          {% for a in aktiviteler %}
+          <option value="{{ a }}" {% if profil.aktivite == a %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-4">
+        <label class="form-label text-muted small">Hedef</label>
+        <select name="hedef" class="form-select">
+          {% for h in hedefler %}
+          <option value="{{ h }}" {% if profil.hedef == h %}selected{% endif %}>{{ h }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-4">
+        <label class="form-label text-muted small">Seviye</label>
+        <select name="seviye" class="form-select">
+          {% for s in seviyeler %}
+          <option value="{{ s }}" {% if profil.seviye == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label text-muted small">Başlangıç Tarihi</label>
+        <input type="date" name="baslangic_tarihi" class="form-control"
+               value="{{ profil.baslangic_tarihi or '' }}">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Hesapla ve Kaydet</button>
+  </form>
+
+  {% if sonuc %}
+  <hr class="border-secondary my-4">
+  <h5 class="text-white">Analiz Sonucu — Hafta {{ sonuc.hafta }}</h5>
+  <div class="row g-3 mt-1">
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-secondary text-white text-center p-3">
+        <div class="small text-muted">VKİ</div>
+        <div class="fs-4 fw-bold">{{ sonuc.vki }}</div>
+        <div class="small">{{ sonuc.vki_kategori }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-secondary text-white text-center p-3">
+        <div class="small text-muted">BMR</div>
+        <div class="fs-4 fw-bold">{{ sonuc.bmr }}</div>
+        <div class="small">kal/gün</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-secondary text-white text-center p-3">
+        <div class="small text-muted">TDEE</div>
+        <div class="fs-4 fw-bold">{{ sonuc.tdee }}</div>
+        <div class="small">kal/gün</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-secondary text-white text-center p-3">
+        <div class="small text-muted">Hedef Kalori</div>
+        <div class="fs-4 fw-bold">{{ sonuc.hedef_kalori }}</div>
+        <div class="small">{{ sonuc.kalori_aciklamasi }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-4 text-center">
+      <div class="card bg-dark border-secondary text-white p-3">
+        <div class="small text-muted">Protein</div>
+        <div class="fw-bold">{{ sonuc.protein_g }} g</div>
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <div class="card bg-dark border-secondary text-white p-3">
+        <div class="small text-muted">Karbonhidrat</div>
+        <div class="fw-bold">{{ sonuc.karb_g }} g</div>
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <div class="card bg-dark border-secondary text-white p-3">
+        <div class="small text-muted">Yağ</div>
+        <div class="fw-bold">{{ sonuc.yag_g }} g</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-dark border-secondary text-white mt-3 p-3">
+    <div class="small text-muted mb-1">Su İhtiyacı</div>
+    <div class="fw-bold">{{ sonuc.su_lt }} litre/gün</div>
+    <hr class="border-secondary">
+    <div class="small text-muted mb-1">VKİ Tavsiyesi</div>
+    <div class="small">{{ sonuc.vki_tavsiye }}</div>
+  </div>
+
+  <div class="card bg-dark border-secondary text-white mt-3 p-3">
+    <div class="fw-bold mb-2">{{ sonuc.program_adi }}</div>
+    <div class="small text-muted mb-2">{{ sonuc.program_gunler }}</div>
+    <ul class="list-group list-group-flush">
+      {% for egzersiz in sonuc.program_liste %}
+      <li class="list-group-item bg-dark text-white border-secondary small">
+        {% if egzersiz[0] %}{{ egzersiz[0] }}{% endif %}
+        {% if egzersiz[1] %} — <span class="text-muted">{{ egzersiz[1] }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="small mt-2 text-muted">{{ sonuc.tavsiye }}</div>
+  </div>
+  {% endif %}
+
+  {% if gecmis %}
+  <hr class="border-secondary my-4">
+  <h5 class="text-white">Son Kayıtlar</h5>
+  <table class="table table-dark table-sm table-bordered mt-2">
+    <thead><tr><th>Tarih</th><th>Kilo</th><th>VKİ</th><th>Hedef Kal.</th></tr></thead>
+    <tbody>
+      {% for kayit in gecmis %}
+      <tr>
+        <td>{{ kayit.tarih }}</td>
+        <td>{{ kayit.kilo }} kg</td>
+        <td>{{ kayit.vki }}</td>
+        <td>{{ kayit.hedef_kalori }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if ilerleme %}
+  <div class="alert alert-secondary small">
+    <strong>İlerleme:</strong>
+    {{ ilerleme.gun_fark }} günde kilo değişimi:
+    <strong>{{ "+" if ilerleme.kilo_fark > 0 else "" }}{{ ilerleme.kilo_fark }} kg</strong>
+    ({{ ilerleme.kayit_sayisi }} kayıt)
+  </div>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
