@@ -1,0 +1,131 @@
+/* ── Genel ───────────────────────────────────────────────── */
+:root {
+  --jkb-bg:       #0f0f1a;
+  --jkb-surface:  #1a1a2e;
+  --jkb-card:     #16213e;
+  --jkb-accent:   #0f3460;
+  --jkb-primary:  #e94560;
+  --jkb-text:     #e0e0e0;
+  --jkb-muted:    #888;
+  --jkb-nav-h:    56px;
+  --jkb-bottom-h: 60px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--jkb-bg);
+  color: var(--jkb-text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  padding-bottom: var(--jkb-bottom-h);
+}
+
+/* ── Navbar ──────────────────────────────────────────────── */
+.jkb-navbar {
+  background-color: var(--jkb-surface) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  height: var(--jkb-nav-h);
+}
+
+.jkb-navbar .nav-link {
+  color: var(--jkb-muted) !important;
+  border-radius: 8px;
+  padding: 6px 12px !important;
+  transition: color .2s, background .2s;
+}
+
+.jkb-navbar .nav-link:hover,
+.jkb-navbar .nav-link.active {
+  color: #fff !important;
+  background: rgba(255,255,255,0.08);
+}
+
+/* ── Hero (Karşılama) ────────────────────────────────────── */
+.jkb-hero {
+  min-height: 100vh;
+  padding-top: var(--jkb-nav-h);
+  background: radial-gradient(ellipse at 60% 40%, #0f3460 0%, var(--jkb-bg) 70%);
+}
+
+.jkb-hero-logo {
+  width: clamp(80px, 20vw, 160px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ── Mobil Alt Navigasyon ────────────────────────────────── */
+.jkb-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--jkb-bottom-h);
+  background: var(--jkb-surface);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1030;
+}
+
+.jkb-bottom-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--jkb-muted);
+  text-decoration: none;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  transition: color .2s;
+}
+
+.jkb-bottom-item i { font-size: 20px; }
+
+.jkb-bottom-item.active,
+.jkb-bottom-item:hover { color: #fff; }
+
+/* ── Kartlar ─────────────────────────────────────────────── */
+.jkb-card {
+  background: var(--jkb-card);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+/* ── Butonlar ────────────────────────────────────────────── */
+.btn-primary {
+  background-color: var(--jkb-primary);
+  border-color: var(--jkb-primary);
+}
+
+.btn-primary:hover {
+  background-color: #c73652;
+  border-color: #c73652;
+}
+
+/* ── Form Alanları ───────────────────────────────────────── */
+.form-control, .form-select {
+  background: var(--jkb-accent);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--jkb-text);
+  border-radius: 10px;
+}
+
+.form-control:focus, .form-select:focus {
+  background: var(--jkb-accent);
+  color: #fff;
+  border-color: var(--jkb-primary);
+  box-shadow: 0 0 0 3px rgba(233,69,96,0.2);
+}
+
+.form-control::placeholder { color: var(--jkb-muted); }
+
+/* ── Yardımcı ────────────────────────────────────────────── */
+.text-muted { color: var(--jkb-muted) !important; }
+
+@media (min-width: 992px) {
+  body { padding-bottom: 0; }
+}

@@ -3,8 +3,14 @@ import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.app import JKBApp
+from flask import Flask, render_template
+
+app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
+app.secret_key = os.environ.get("SECRET_KEY", "jkb-gizli-anahtar-2026")
+
+@app.route("/")
+def karsilama():
+    return render_template("karsilama.html")
 
 if __name__ == "__main__":
-    app = JKBApp()
-    app.mainloop()
+    app.run(host="0.0.0.0", port=5000, debug=True)
