@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "ClGzkyJe4MItct-oJ85-y"
+uri = "file://JKB_proje.zip"
+type = "unspecified"
+title = "JKB Proje — Tam Kaynak Kodu"
