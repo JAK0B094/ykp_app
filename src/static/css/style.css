@@ -129,3 +129,43 @@ body {
 @media (min-width: 992px) {
   body { padding-bottom: 0; }
 }
+
+/* ── Auth Sayfaları ──────────────────────────────────────── */
+.jkb-auth-wrap {
+  min-height: 100vh;
+  padding-top: calc(var(--jkb-nav-h) + 20px);
+  padding-bottom: 40px;
+}
+
+.jkb-auth-card {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.jkb-input-icon {
+  background: var(--jkb-accent);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-right: none;
+  color: var(--jkb-muted);
+}
+
+.jkb-link {
+  color: var(--jkb-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.jkb-link:hover {
+  color: #ff6b87;
+  text-decoration: underline;
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn-success:hover {
+  background-color: #146c43;
+  border-color: #146c43;
+}

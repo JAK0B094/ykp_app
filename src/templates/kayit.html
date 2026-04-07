@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Kayıt Ol{% endblock %}
+
+{% block content %}
+<div class="jkb-auth-wrap d-flex align-items-center justify-content-center px-3">
+  <div class="jkb-auth-card jkb-card w-100">
+
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="JKB" height="52" class="mb-3" style="border-radius:12px">
+      <h2 class="fw-bold text-white mb-1">Kayıt Ol</h2>
+      <p class="text-muted small">Ücretsiz hesap oluştur.</p>
+    </div>
+
+    {% if hata %}
+    <div class="alert alert-danger d-flex align-items-center gap-2 py-2" role="alert">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <span>{{ hata }}</span>
+    </div>
+    {% endif %}
+
+    {% if basari_mesaj %}
+    <div class="alert alert-success d-flex align-items-center gap-2 py-2" role="alert">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ basari_mesaj }} <a href="/giris" class="alert-link">Giriş yap →</a></span>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/kayit" novalidate>
+      <div class="mb-3">
+        <label class="form-label text-muted small" for="kullanici_adi">Kullanıcı Adı</label>
+        <div class="input-group">
+          <span class="input-group-text jkb-input-icon"><i class="bi bi-person"></i></span>
+          <input
+            type="text"
+            class="form-control"
+            id="kullanici_adi"
+            name="kullanici_adi"
+            placeholder="3-46 karakter"
+            autocomplete="username"
+            minlength="3"
+            maxlength="46"
+            required
+            autofocus
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small" for="eposta">E-Posta</label>
+        <div class="input-group">
+          <span class="input-group-text jkb-input-icon"><i class="bi bi-envelope"></i></span>
+          <input
+            type="email"
+            class="form-control"
+            id="eposta"
+            name="eposta"
+            placeholder="ornek@mail.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small" for="sifre">Şifre</label>
+        <div class="input-group">
+          <span class="input-group-text jkb-input-icon"><i class="bi bi-lock"></i></span>
+          <input
+            type="password"
+            class="form-control"
+            id="sifre"
+            name="sifre"
+            placeholder="6-32 karakter"
+            autocomplete="new-password"
+            minlength="6"
+            maxlength="32"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label text-muted small" for="sifre2">Şifre Tekrar</label>
+        <div class="input-group">
+          <span class="input-group-text jkb-input-icon"><i class="bi bi-lock-fill"></i></span>
+          <input
+            type="password"
+            class="form-control"
+            id="sifre2"
+            name="sifre2"
+            placeholder="Şifreni tekrar gir"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+        <i class="bi bi-person-check me-2"></i>Hesabı Oluştur
+      </button>
+    </form>
+
+    <hr class="my-4 border-secondary" />
+
+    <p class="text-center text-muted small mb-0">
+      Zaten hesabın var mı?
+      <a href="/giris" class="jkb-link">Giriş Yap</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
