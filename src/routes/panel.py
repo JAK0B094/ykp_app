@@ -51,7 +51,10 @@ def profil():
     db = KimlikDogrulama()
     kullanici = session["kullanici"]
     bilgi = db.kullanici_bilgi_getir(kullanici)
-    return render_template("profil.html", kullanici=kullanici, eposta=bilgi.get("eposta", ""))
+    return render_template("profil.html",
+                           kullanici=kullanici,
+                           eposta=bilgi.get("eposta", ""),
+                           telefon=bilgi.get("telefon", ""))
 
 
 @panel.route("/profil/sifre", methods=["POST"])
@@ -66,15 +69,28 @@ def sifre_degistir():
     yeni = request.form.get("yeni_sifre", "")
     yeni2 = request.form.get("yeni_sifre2", "")
 
+    kwargs = dict(kullanici=kullanici,
+                  eposta=bilgi.get("eposta", ""),
+                  telefon=bilgi.get("telefon", ""))
+
     if yeni != yeni2:
-        return render_template("profil.html", kullanici=kullanici,
-                               eposta=bilgi.get("eposta", ""),
-                               hata="Yeni şifreler uyuşmuyor!")
+        return render_template("profil.html", hata="Yeni şifreler uyuşmuyor!", **kwargs)
     basari, mesaj = db.sifre_degistir(kullanici, eski, yeni)
     if basari:
-        return render_template("profil.html", kullanici=kullanici,
-                               eposta=bilgi.get("eposta", ""),
-                               basari=mesaj)
-    return render_template("profil.html", kullanici=kullanici,
-                           eposta=bilgi.get("eposta", ""),
-                           hata=mesaj)
+        return render_template("profil.html", basari=mesaj, **kwargs)
+    return render_template("profil.html", hata=mesaj, **kwargs)
+
+
+@panel.route("/profil/telefon", methods=["POST"])
+@giris_gerekli
+def telefon_guncelle():
+    from src.data.kimlik_dogrulama import KimlikDogrulama
+    db = KimlikDogrulama()
+    kullanici = session["kullanici"]
+    telefon = request.form.get("telefon", "").strip()
+    db._kullanici_guncelle(kullanici, "telefon", telefon or "")
+    if telefon:
+        flash("Telefon numarası güncellendi.", "success")
+    else:
+        flash("Telefon numarası silindi.", "info")
+    return redirect(url_for("panel.profil"))

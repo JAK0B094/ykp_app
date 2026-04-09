@@ -2,32 +2,84 @@
 {% block title %}Profil{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width:480px">
+<div class="container py-4" style="max-width:520px">
   <h4 class="text-white mb-4">Profilim</h4>
 
-  <div class="card bg-dark border-secondary text-white p-3 mb-4">
-    <div class="mb-2"><span class="text-muted">Kullanıcı Adı:</span> <strong>{{ kullanici }}</strong></div>
-    <div class="mb-2"><span class="text-muted">E-Posta:</span> {{ eposta or "—" }}</div>
+  <!-- Profil Bilgileri -->
+  <div class="jkb-card mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div class="profil-avatar">{{ kullanici[0]|upper }}</div>
+      <div>
+        <div class="fw-bold text-white fs-5">{{ kullanici }}</div>
+        <div class="text-muted small">{{ eposta or "—" }}</div>
+      </div>
+    </div>
+    <div class="row g-2">
+      <div class="col-6">
+        <div class="small text-muted">Telefon</div>
+        <div class="text-white small">{{ telefon or "—" }}</div>
+      </div>
+      <div class="col-6 text-end">
+        <a href="#telefonDuzenle" class="btn btn-outline-secondary btn-sm"
+           data-bs-toggle="collapse">Telefon Düzenle</a>
+      </div>
+    </div>
+
+    <div class="collapse mt-3" id="telefonDuzenle">
+      <form method="POST" action="/profil/telefon">
+        <div class="input-group mb-2">
+          <span class="input-group-text jkb-input-icon"><i class="bi bi-phone"></i></span>
+          <input type="tel" class="form-control" name="telefon"
+                 value="{{ telefon or '' }}" placeholder="+90 5XX XXX XX XX">
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+          {% if telefon %}
+          <button type="submit" form="telefonSilForm" class="btn btn-outline-danger btn-sm">Sil</button>
+          {% endif %}
+        </div>
+      </form>
+      {% if telefon %}
+      <form id="telefonSilForm" method="POST" action="/profil/telefon">
+        <input type="hidden" name="telefon" value="">
+      </form>
+      {% endif %}
+    </div>
   </div>
 
-  <h6 class="text-muted mb-2">Şifre Değiştir</h6>
-  <form method="POST" action="/profil/sifre">
+  <!-- QR Kodu -->
+  <div class="jkb-card mb-4 text-center">
+    <div class="small text-muted mb-2">Profil QR Kodu</div>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?data=JKB://kullanici/{{ kullanici }}&size=160x160&bgcolor=1a1a2e&color=e0e0e0&margin=10"
+         alt="QR Kod" class="rounded" width="160" height="160"
+         onerror="this.style.display='none'">
+    <div class="small text-muted mt-2">{{ kullanici }}</div>
+  </div>
+
+  <!-- Şifre Değiştir -->
+  <div class="jkb-card">
+    <h6 class="text-muted mb-3">Şifre Değiştir</h6>
     {% if hata %}
     <div class="alert alert-danger small py-2">{{ hata }}</div>
     {% endif %}
     {% if basari %}
     <div class="alert alert-success small py-2">{{ basari }}</div>
     {% endif %}
-    <div class="mb-2">
-      <input type="password" name="eski_sifre" class="form-control" placeholder="Mevcut şifre" required>
-    </div>
-    <div class="mb-2">
-      <input type="password" name="yeni_sifre" class="form-control" placeholder="Yeni şifre (6-32 karakter)" required>
-    </div>
-    <div class="mb-3">
-      <input type="password" name="yeni_sifre2" class="form-control" placeholder="Yeni şifre tekrar" required>
-    </div>
-    <button type="submit" class="btn btn-outline-light">Şifreyi Güncelle</button>
-  </form>
+    <form method="POST" action="/profil/sifre">
+      <div class="mb-2">
+        <input type="password" name="eski_sifre" class="form-control"
+               placeholder="Mevcut şifre" required>
+      </div>
+      <div class="mb-2">
+        <input type="password" name="yeni_sifre" class="form-control"
+               placeholder="Yeni şifre (6-32 karakter)" required>
+      </div>
+      <div class="mb-3">
+        <input type="password" name="yeni_sifre2" class="form-control"
+               placeholder="Yeni şifre tekrar" required>
+      </div>
+      <button type="submit" class="btn btn-outline-light">Şifreyi Güncelle</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

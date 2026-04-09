@@ -15,14 +15,13 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
   <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png" sizes="512x512" />
 
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    rel="stylesheet"
-  />
+  <!-- Google Fonts: Pacifico (imza için) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
   <title>{% block title %}JKB{% endblock %} — JKB</title>
@@ -33,80 +32,68 @@
   <nav class="navbar navbar-expand-lg navbar-dark jkb-navbar fixed-top">
     <div class="container-fluid px-3">
 
-      <!-- Logo + Marka -->
       <a class="navbar-brand d-flex align-items-center gap-2" href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="JKB" height="32" />
         <span class="fw-bold">JKB</span>
       </a>
 
-      <!-- Mobil Toggle -->
-      <button
-        class="navbar-toggler border-0"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navMenu"
-        aria-controls="navMenu"
-        aria-expanded="false"
-        aria-label="Menüyü aç"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <div class="d-flex align-items-center gap-2 d-lg-none">
+        <!-- Mobil: tema toggle -->
+        <button class="btn btn-link nav-link p-1" id="temaToggleMobil" onclick="temaToggle()" title="Tema Değiştir">
+          <i class="bi bi-sun" id="temaIkonMobil" style="font-size:18px"></i>
+        </button>
+        <button class="navbar-toggler border-0" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navMenu"
+                aria-controls="navMenu" aria-expanded="false" aria-label="Menüyü aç">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
 
-      <!-- Menü -->
       <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1 align-items-lg-center">
           {% if session.get('kullanici') %}
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'panel.ana_panel' %}active{% endif %}"
-                 href="/panel">
-                <i class="bi bi-house-door"></i> Ana Sayfa
-              </a>
+                 href="/panel"><i class="bi bi-house-door"></i> Ana Sayfa</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'fitness.fitness_sayfasi' %}active{% endif %}"
-                 href="/fitness">
-                <i class="bi bi-activity"></i> Fitness
-              </a>
+                 href="/fitness"><i class="bi bi-activity"></i> Fitness</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'gorevler.gorev_sayfasi' %}active{% endif %}"
-                 href="/gorevler">
-                <i class="bi bi-check2-square"></i> Görevler
-              </a>
+                 href="/gorevler"><i class="bi bi-check2-square"></i> Görevler</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'notlar.not_sayfasi' %}active{% endif %}"
-                 href="/notlar">
-                <i class="bi bi-journal-text"></i> Notlar
-              </a>
+                 href="/notlar"><i class="bi bi-journal-text"></i> Notlar</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'panel.profil' %}active{% endif %}"
-                 href="/profil">
-                <i class="bi bi-person-circle"></i>
-                {{ session.get('kullanici') }}
-              </a>
+                 href="/profil"><i class="bi bi-person-circle"></i> {{ session.get('kullanici') }}</a>
             </li>
             <li class="nav-item">
               <a class="nav-link text-danger" href="/cikis">
-                <i class="bi bi-box-arrow-right"></i> Çıkış
-              </a>
+                <i class="bi bi-box-arrow-right"></i> Çıkış</a>
             </li>
           {% else %}
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'auth.giris' %}active{% endif %}"
-                 href="/giris">
-                <i class="bi bi-box-arrow-in-right"></i> Giriş Yap
-              </a>
+                 href="/giris"><i class="bi bi-box-arrow-in-right"></i> Giriş Yap</a>
             </li>
             <li class="nav-item">
               <a class="nav-link btn btn-sm btn-outline-light px-3 ms-1
                          {% if request.endpoint == 'auth.kayit' %}active{% endif %}"
-                 href="/kayit">
-                <i class="bi bi-person-plus"></i> Kayıt Ol
-              </a>
+                 href="/kayit"><i class="bi bi-person-plus"></i> Kayıt Ol</a>
             </li>
           {% endif %}
+
+          <!-- Masaüstü tema toggle -->
+          <li class="nav-item d-none d-lg-block ms-1">
+            <button class="btn btn-link nav-link px-2" id="temaToggle" onclick="temaToggle()" title="Tema Değiştir">
+              <i class="bi bi-sun" id="temaIkon" style="font-size:18px"></i>
+            </button>
+          </li>
         </ul>
       </div>
     </div>
@@ -126,34 +113,59 @@
     {% endwith %}
   </div>
 
-  <!-- Sayfa İçeriği -->
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+  <main>{% block content %}{% endblock %}</main>
 
-  <!-- Alt Çubuk (Mobil) -->
+  <!-- Alt Navigasyon (Mobil) -->
   {% if session.get('kullanici') %}
   <nav class="jkb-bottom-nav d-lg-none">
-    <a href="/panel"     class="jkb-bottom-item {% if request.endpoint == 'panel.ana_panel' %}active{% endif %}">
+    <a href="/panel"    class="jkb-bottom-item {% if request.endpoint == 'panel.ana_panel' %}active{% endif %}">
       <i class="bi bi-house-door-fill"></i><span>Ana</span>
     </a>
-    <a href="/fitness"   class="jkb-bottom-item {% if request.endpoint == 'fitness.fitness_sayfasi' %}active{% endif %}">
+    <a href="/fitness"  class="jkb-bottom-item {% if request.endpoint == 'fitness.fitness_sayfasi' %}active{% endif %}">
       <i class="bi bi-activity"></i><span>Fitness</span>
     </a>
-    <a href="/gorevler"  class="jkb-bottom-item {% if request.endpoint == 'gorevler.gorev_sayfasi' %}active{% endif %}">
+    <a href="/gorevler" class="jkb-bottom-item {% if request.endpoint == 'gorevler.gorev_sayfasi' %}active{% endif %}">
       <i class="bi bi-check2-square"></i><span>Görevler</span>
     </a>
-    <a href="/notlar"    class="jkb-bottom-item {% if request.endpoint == 'notlar.not_sayfasi' %}active{% endif %}">
+    <a href="/notlar"   class="jkb-bottom-item {% if request.endpoint == 'notlar.not_sayfasi' %}active{% endif %}">
       <i class="bi bi-journal-text"></i><span>Notlar</span>
     </a>
-    <a href="/profil"    class="jkb-bottom-item {% if request.endpoint == 'panel.profil' %}active{% endif %}">
+    <a href="/profil"   class="jkb-bottom-item {% if request.endpoint == 'panel.profil' %}active{% endif %}">
       <i class="bi bi-person-circle"></i><span>Profil</span>
     </a>
   </nav>
   {% endif %}
 
+  <!-- Made By Picak imzası -->
+  <div class="picak-imza">Made By Picak</div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script>
+    // ── Tema Yönetimi ────────────────────────────────────────────
+    function temaToggle() {
+      const light = document.body.classList.toggle('light-mode');
+      localStorage.setItem('jkb_tema', light ? 'light' : 'dark');
+      document.querySelectorAll('[id^="temaIkon"]').forEach(el => {
+        el.className = light ? 'bi bi-moon-stars-fill' : 'bi bi-sun';
+      });
+    }
+    (function initTema() {
+      if (localStorage.getItem('jkb_tema') === 'light') {
+        document.body.classList.add('light-mode');
+        document.querySelectorAll('[id^="temaIkon"]').forEach(el => {
+          el.className = 'bi bi-moon-stars-fill';
+        });
+      }
+    })();
+
+    // ── PWA Service Worker ───────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+    }
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

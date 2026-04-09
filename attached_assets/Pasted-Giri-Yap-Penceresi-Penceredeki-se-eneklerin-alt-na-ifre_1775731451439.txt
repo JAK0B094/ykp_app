@@ -1,0 +1,44 @@
+Giriş Yap Penceresi
+
+•	Penceredeki seçeneklerin altına “Şifrenizi mi? Unuttunuz.” Şeklinde küçük bir eklenti ekle. 
+	Kullanıcılar şifrelerini unutabilirler o yüzden unuttuklarında bu seçeneğe basarak şifrelerini sıfırlayıp yeni şifreleri ile giriş yapabilsin.
+	Seçeneğe basınca her zamanki gibi profesyonelliğe önem verdiğin gibi aynı önem ile kullanıcılar kolay ve rahat şekilde şifrelerini sıfırlamasını sağla.
+	Güvenli ve doğru şekilde hataya izin verme ve sahtekarlığa, dolandırıcılığa ve acemiliğe asla izin verme.
+	Şifresini sıfırlayacak kullanıcı gerçekten hesabın sahibi olması gerek onun için gereken önlemleri al. (Örnek; Doğru e-posta bilgisini girmesi gerek ve o e-postaya anında bir doğrulama kodu gitmesi gerek, kullanıcı e-postasına gelen doğrulama kodunu doğru yazarak şifre sıfırlama işlemini aktifleştirmesi gerek.
+	Doğrulama kodları 6 haneli sayılar olacak ve devamlı belirttiğim gibi güvenlik, gizlilik en baştaki hassasiyetimiz çerçevesinde sayılar rastgele ve güvenilir biçimde olması gerek.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Antrenman ve Beslenme "Pro" Özellikleri (Yeni Eklemeler)
+•	Dinamik Set Takibi: Program sekmesindeki her hareketin yanına "Ağırlık (kg)" ve "Tekrar" kutucukları ekle. Kullanıcı girdiğinde DB'ye kaydet.
+•	Rest Timer & Ses: Bir hareket tamamlandığında otomatik 60 saniyelik geri sayım başlasın. Süre bitince Web Audio API ile kısa bir "bip" sesi çalsın.
+•	Alternatif Hareket: Her egzersiz kartına bir "Alternatif" butonu ekle. Basıldığında aynı kas grubunu çalıştıran farklı bir hareket modal (açılır pencere) olarak gelsin.
+•	Makro İlerleme: Kalori panelinin altına Protein, Karbonhidrat ve Yağ için 3 ayrı renkli progress bar ekle.
+3. Analitik ve Görselleştirme (Data Visualization)
+•	Chart.js Entegrasyonu: Analiz sekmesine iki grafik ekle:
+1.	Son 7 günlük kilo değişimi (Çizgi grafik).
+2.	Haftalık su tüketim başarısı (Sütun grafik).
+•	Vücut Ölçüleri: Kilo dışında; Kol, Bel, Omuz ölçülerini tarihli olarak kaydeden küçük bir form ve tablo ekle.
+4. "Full+Full" Ekstra Fikirler (Uygulamayı Zirveye Taşıyacaklar)
+•	Gece/Gündüz Modu Geçişi: Sağ üste bir "Güneş/Ay" ikonu ekle, kullanıcı dilerse açık temaya geçebilsin.
+•	Su İçme Level Sistemi: Kullanıcı su içtikçe bir "Deneyim Çubuğu" (XP) dolsun. 8 bardağa ulaşınca "Level Up!" yazısı ve konfeti animasyonu çıksın.
+•	Antrenman Arkadaşı (AI Motivasyon): Motivasyon sekmesine, kullanıcının o günkü moduna göre rastgele sesli veya yazılı "Sert" veya "Destekleyici" mesaj veren bir sistem kur.
+•	QR Kod ile Giriş: Kullanıcı profilinde kendine özel bir QR kod olsun (ileride başka cihazdan hızlı giriş için altyapı).
+•	PWA Desteği: Uygulamanın manifest.json ve service-worker.js dosyalarını oluştur, böylece telefona "Uygulama Olarak Ekle" denildiğinde gerçek bir app gibi yüklensin.
+5. Mobil Navigasyon (UX)
+•	Ekran 768px'den küçükse üst menüyü gizle. Ekranın en altına sabit (fixed), ikonlu bir Bottom Navigation Bar ekle (Ana Sayfa, Fitness, Görevler, Notlar, Profil).

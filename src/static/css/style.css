@@ -19,7 +19,31 @@ body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   min-height: 100vh;
   padding-bottom: var(--jkb-bottom-h);
+  transition: background-color .3s, color .3s;
 }
+
+/* ── Açık Tema ───────────────────────────────────────────── */
+body.light-mode {
+  --jkb-bg:       #eef1f7;
+  --jkb-surface:  #ffffff;
+  --jkb-card:     #f4f6fb;
+  --jkb-accent:   #e0e6f0;
+  --jkb-text:     #1a1a2e;
+  --jkb-muted:    #5a6a80;
+}
+body.light-mode .jkb-navbar { background: rgba(255,255,255,0.97) !important; }
+body.light-mode .navbar-brand span,
+body.light-mode .jkb-navbar .nav-link { color: #1a1a2e !important; }
+body.light-mode .text-white { color: #1a1a2e !important; }
+body.light-mode .text-secondary { color: #5a6a80 !important; }
+body.light-mode .form-control,
+body.light-mode .form-select { color: #1a1a2e; }
+body.light-mode .jkb-bottom-nav { background: rgba(255,255,255,0.97); border-color: rgba(0,0,0,0.1); }
+body.light-mode .table-dark { background: var(--jkb-card) !important; color: var(--jkb-text) !important; }
+body.light-mode .modal-content { background: var(--jkb-surface) !important; color: var(--jkb-text) !important; }
+body.light-mode .bg-dark { background: var(--jkb-card) !important; }
+body.light-mode .border-secondary { border-color: rgba(0,0,0,0.1) !important; }
+body.light-mode .list-group-item.bg-dark { background: var(--jkb-card) !important; color: var(--jkb-text) !important; }
 
 /* ── Navbar ──────────────────────────────────────────────── */
 .jkb-navbar {
@@ -44,22 +68,69 @@ body {
 /* ── Hero (Karşılama) ────────────────────────────────────── */
 .jkb-hero {
   min-height: 100vh;
-  padding-top: var(--jkb-nav-h);
-  background: radial-gradient(ellipse at 60% 40%, #0f3460 0%, var(--jkb-bg) 70%);
+  padding-top: calc(var(--jkb-nav-h) + 6vh);
+  padding-bottom: 10vh;
+  background: radial-gradient(ellipse at 55% 35%, rgba(15,52,96,0.8) 0%, var(--jkb-bg) 65%);
+  justify-content: center;
 }
 
+.pt-hero { padding-top: calc(var(--jkb-nav-h) + 5vh) !important; }
+.pb-hero { padding-bottom: 12vh !important; }
+
 .jkb-hero-logo {
-  width: clamp(80px, 20vw, 160px);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  width: clamp(100px, 22vw, 190px);
+  border-radius: 24px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.hero-logo-float { animation: heroFloat 4s ease-in-out infinite; }
+
+.hero-divider {
+  width: 60px; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--jkb-primary), transparent);
+  border-radius: 2px;
+}
+
+.hero-brand-title { letter-spacing: -1px; }
+
+.text-gradient {
+  background: linear-gradient(135deg, #e94560, #f7b731);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Made By Picak İmzası ────────────────────────────────── */
+@keyframes picakGlow {
+  0%, 100% { text-shadow: 0 0 8px #ff8c00, 0 0 20px rgba(255,140,0,0.4); opacity: .85; }
+  50%       { text-shadow: 0 0 3px #ff8c00; opacity: .5; }
+}
+
+.picak-imza {
+  position: fixed;
+  bottom: calc(var(--jkb-bottom-h) + 10px);
+  left: 16px;
+  font-family: 'Pacifico', cursive;
+  font-size: 13px;
+  color: #ff8c00;
+  animation: picakGlow 2.8s ease-in-out infinite;
+  z-index: 1020;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 992px) {
+  .picak-imza { bottom: 14px; }
 }
 
 /* ── Mobil Alt Navigasyon ────────────────────────────────── */
 .jkb-bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   height: var(--jkb-bottom-h);
   background: var(--jkb-surface);
   border-top: 1px solid rgba(255,255,255,0.07);
@@ -70,20 +141,14 @@ body {
 }
 
 .jkb-bottom-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
   color: var(--jkb-muted);
-  text-decoration: none;
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: 10px;
+  text-decoration: none; font-size: 10px;
+  padding: 4px 8px; border-radius: 10px;
   transition: color .2s;
 }
-
 .jkb-bottom-item i { font-size: 20px; }
-
 .jkb-bottom-item.active,
 .jkb-bottom-item:hover { color: #fff; }
 
@@ -100,11 +165,7 @@ body {
   background-color: var(--jkb-primary);
   border-color: var(--jkb-primary);
 }
-
-.btn-primary:hover {
-  background-color: #c73652;
-  border-color: #c73652;
-}
+.btn-primary:hover { background-color: #c73652; border-color: #c73652; }
 
 /* ── Form Alanları ───────────────────────────────────────── */
 .form-control, .form-select {
@@ -113,14 +174,12 @@ body {
   color: var(--jkb-text);
   border-radius: 10px;
 }
-
 .form-control:focus, .form-select:focus {
   background: var(--jkb-accent);
   color: #fff;
   border-color: var(--jkb-primary);
   box-shadow: 0 0 0 3px rgba(233,69,96,0.2);
 }
-
 .form-control::placeholder { color: var(--jkb-muted); }
 
 /* ── Yardımcı ────────────────────────────────────────────── */
@@ -136,11 +195,7 @@ body {
   padding-top: calc(var(--jkb-nav-h) + 20px);
   padding-bottom: 40px;
 }
-
-.jkb-auth-card {
-  max-width: 440px;
-  margin: 0 auto;
-}
+.jkb-auth-card { max-width: 440px; margin: 0 auto; }
 
 .jkb-input-icon {
   background: var(--jkb-accent);
@@ -149,28 +204,53 @@ body {
   color: var(--jkb-muted);
 }
 
-.jkb-link {
-  color: var(--jkb-primary);
-  text-decoration: none;
-  font-weight: 600;
+.jkb-link { color: var(--jkb-primary); text-decoration: none; font-weight: 600; }
+.jkb-link:hover { color: #ff6b87; text-decoration: underline; }
+
+.btn-success { background-color: #198754; border-color: #198754; }
+.btn-success:hover { background-color: #146c43; border-color: #146c43; }
+
+/* ── Şifre Sıfırlama Adım Göstergesi ────────────────────── */
+.reset-step {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--jkb-accent);
+  border: 2px solid rgba(255,255,255,0.15);
+  color: var(--jkb-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  transition: all .3s;
+}
+.reset-step.active { background: var(--jkb-primary); border-color: var(--jkb-primary); color: #fff; }
+.reset-step.done   { background: #198754; border-color: #198754; color: #fff; }
+
+.reset-step-line {
+  width: 40px; height: 2px;
+  background: rgba(255,255,255,0.1);
+  transition: background .3s;
+}
+.reset-step-line.done { background: #198754; }
+
+/* OTP input */
+.otp-input {
+  letter-spacing: 8px;
+  font-size: 24px;
+  text-align: center;
+  background: var(--jkb-accent);
+  border-color: rgba(255,255,255,0.15);
 }
 
-.jkb-link:hover {
-  color: #ff6b87;
-  text-decoration: underline;
+/* ── Profil Sayfası ──────────────────────────────────────── */
+.profil-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--jkb-primary), #f7b731);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900; color: #fff;
+  flex-shrink: 0;
 }
 
-.btn-success {
-  background-color: #198754;
-  border-color: #198754;
-}
-
-.btn-success:hover {
-  background-color: #146c43;
-  border-color: #146c43;
-}
-
-/* ── Fitness Sayfası ─────────────────────────────────────────────────────── */
+/* ── Fitness Sayfası ─────────────────────────────────────── */
 .fitness-tabs .nav-link {
   color: var(--jkb-muted);
   border-color: transparent;
@@ -199,6 +279,9 @@ body {
   padding: 14px 10px;
 }
 
+/* Makro Progress Barlar */
+.macro-bar-label { font-size: 11px; }
+
 /* Egzersiz Kartları */
 .egzersiz-karti {
   background: var(--jkb-card);
@@ -213,25 +296,41 @@ body {
   transform: translateY(-2px);
 }
 .egzersiz-resim-alan {
-  width: 100%;
-  height: 160px;
+  width: 100%; height: 160px;
   background: #0d1117;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
 }
-.egzersiz-resim {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  display: none;
+.egzersiz-resim { width:100%; height:160px; object-fit:cover; display:none; }
+.egzersiz-placeholder { align-items:center; justify-content:center; width:100%; height:100%; }
+
+/* Set Takip Alanları */
+.set-tracking input { font-size: 12px; }
+
+/* Alternatif Buton */
+.btn-alternatif {
+  font-size: 11px;
+  padding: 2px 8px;
+  opacity: .7;
+  transition: opacity .2s;
 }
-.egzersiz-placeholder {
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+.btn-alternatif:hover { opacity: 1; }
+
+/* Rest Timer Widget */
+.rest-timer-widget {
+  position: fixed;
+  bottom: calc(var(--jkb-bottom-h) + 8px);
+  right: 16px;
+  background: var(--jkb-surface);
+  border: 1px solid rgba(233,69,96,0.5);
+  border-radius: 16px;
+  padding: 12px 18px;
+  z-index: 1040;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  min-width: 180px;
+}
+@media (min-width: 992px) {
+  .rest-timer-widget { bottom: 16px; }
 }
 
 /* Su Bardakları */
@@ -241,10 +340,8 @@ body {
   border-radius: 10px;
   padding: 8px 10px;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
   color: var(--jkb-muted);
   font-size: 20px;
   transition: all .15s;
@@ -256,6 +353,10 @@ body {
   color: #0dcaf0;
 }
 .su-bardak:hover { transform: scale(1.1); }
+
+/* Su XP Bar */
+.su-xp-bar { background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; }
+.su-xp-fill { background: linear-gradient(90deg, #0dcaf0, #0d6efd); height: 100%; border-radius: 4px; transition: width .4s ease; }
 
 /* Hatırlatıcı Kartları */
 .hatirlatici-karti {
@@ -271,11 +372,13 @@ body {
   border: 1px solid rgba(233,69,96,0.3);
   border-radius: 16px;
   min-height: 140px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
 }
+
+/* AI Motivasyon Modu Seçici */
+.mod-btn { transition: all .2s; }
+.mod-btn.active-mod { box-shadow: 0 0 0 2px var(--jkb-primary); }
 
 /* Modal koyu tema */
 .modal-content.bg-dark { background: var(--jkb-surface) !important; }
