@@ -169,3 +169,113 @@ body {
   background-color: #146c43;
   border-color: #146c43;
 }
+
+/* ── Fitness Sayfası ─────────────────────────────────────────────────────── */
+.fitness-tabs .nav-link {
+  color: var(--jkb-muted);
+  border-color: transparent;
+  border-radius: 8px 8px 0 0;
+  font-size: 13px;
+  padding: 8px 14px;
+}
+.fitness-tabs .nav-link.active {
+  background: var(--jkb-card);
+  color: #fff;
+  border-color: rgba(255,255,255,0.1) rgba(255,255,255,0.1) var(--jkb-card);
+}
+
+.fitness-stat-card {
+  background: var(--jkb-card);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--jkb-text);
+}
+
+.fitness-macro-card {
+  background: var(--jkb-accent);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 14px 10px;
+}
+
+/* Egzersiz Kartları */
+.egzersiz-karti {
+  background: var(--jkb-card);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+  height: 100%;
+}
+.egzersiz-karti:hover {
+  border-color: rgba(233,69,96,0.4);
+  transform: translateY(-2px);
+}
+.egzersiz-resim-alan {
+  width: 100%;
+  height: 160px;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.egzersiz-resim {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: none;
+}
+.egzersiz-placeholder {
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Su Bardakları */
+.su-bardak {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--jkb-muted);
+  font-size: 20px;
+  transition: all .15s;
+  min-width: 48px;
+}
+.su-bardak.dolu {
+  background: rgba(13,202,240,0.15);
+  border-color: rgba(13,202,240,0.4);
+  color: #0dcaf0;
+}
+.su-bardak:hover { transform: scale(1.1); }
+
+/* Hatırlatıcı Kartları */
+.hatirlatici-karti {
+  background: var(--jkb-accent);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+/* Motivasyon Kartı */
+.motivasyon-karti {
+  background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+  border: 1px solid rgba(233,69,96,0.3);
+  border-radius: 16px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal koyu tema */
+.modal-content.bg-dark { background: var(--jkb-surface) !important; }

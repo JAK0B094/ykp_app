@@ -2,173 +2,500 @@
 {% block title %}Fitness Koçu{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <h4 class="text-white mb-3">Fitness Koçu</h4>
+<div class="container-fluid py-3" style="max-width:1100px">
+
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="text-white mb-0">Fitness Koçu</h4>
+    {% if sonuc %}
+    <div class="d-flex gap-2 align-items-center">
+      <span class="badge bg-secondary">Hafta {{ sonuc.hafta }}</span>
+      <span class="badge" style="background:{{ sonuc.vki_renk }}">VKİ {{ sonuc.vki }}</span>
+      <span class="badge bg-primary">{{ sonuc.hedef_kalori }} kal</span>
+    </div>
+    {% endif %}
+  </div>
 
   {% if hata %}
-  <div class="alert alert-danger">{{ hata }}</div>
+  <div class="alert alert-danger py-2">{{ hata }}</div>
   {% endif %}
 
-  <form method="POST" action="/fitness">
-    <div class="row g-2 mb-3">
-      <div class="col-6 col-md-3">
-        <label class="form-label text-muted small">Boy (cm)</label>
-        <input type="number" name="boy" class="form-control" step="0.1"
-               value="{{ profil.boy or '' }}" placeholder="175" required>
-      </div>
-      <div class="col-6 col-md-3">
-        <label class="form-label text-muted small">Kilo (kg)</label>
-        <input type="number" name="kilo" class="form-control" step="0.1"
-               value="{{ profil.kilo or '' }}" placeholder="75" required>
-      </div>
-      <div class="col-6 col-md-3">
-        <label class="form-label text-muted small">Yaş</label>
-        <input type="number" name="yas" class="form-control"
-               value="{{ profil.yas or '' }}" placeholder="25" required>
-      </div>
-      <div class="col-6 col-md-3">
-        <label class="form-label text-muted small">Cinsiyet</label>
-        <select name="cinsiyet" class="form-select">
-          <option value="Erkek" {% if profil.cinsiyet == 'Erkek' %}selected{% endif %}>Erkek</option>
-          <option value="Kadın" {% if profil.cinsiyet == 'Kadın' %}selected{% endif %}>Kadın</option>
-        </select>
-      </div>
-      <div class="col-12 col-md-4">
-        <label class="form-label text-muted small">Aktivite Seviyesi</label>
-        <select name="aktivite" class="form-select">
-          {% for a in aktiviteler %}
-          <option value="{{ a }}" {% if profil.aktivite == a %}selected{% endif %}>{{ a }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-6 col-md-4">
-        <label class="form-label text-muted small">Hedef</label>
-        <select name="hedef" class="form-select">
-          {% for h in hedefler %}
-          <option value="{{ h }}" {% if profil.hedef == h %}selected{% endif %}>{{ h }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-6 col-md-4">
-        <label class="form-label text-muted small">Seviye</label>
-        <select name="seviye" class="form-select">
-          {% for s in seviyeler %}
-          <option value="{{ s }}" {% if profil.seviye == s %}selected{% endif %}>{{ s }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-12 col-md-4">
-        <label class="form-label text-muted small">Başlangıç Tarihi</label>
-        <input type="date" name="baslangic_tarihi" class="form-control"
-               value="{{ profil.baslangic_tarihi or '' }}">
-      </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Hesapla ve Kaydet</button>
-  </form>
+  <!-- Tab Navigasyonu -->
+  <ul class="nav nav-tabs fitness-tabs mb-3" id="fitnessTabs" role="tablist">
+    <li class="nav-item"><a class="nav-link {% if show_tab == 'analiz' %}active{% endif %}"
+        data-bs-toggle="tab" href="#analiz" role="tab">Analiz</a></li>
+    <li class="nav-item"><a class="nav-link {% if show_tab == 'program' %}active{% endif %}"
+        data-bs-toggle="tab" href="#program" role="tab">Program</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#takip" role="tab">Takip</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#hatirlatici" role="tab">Hatırlatıcı</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#motivasyon" role="tab">Motivasyon</a></li>
+  </ul>
 
-  {% if sonuc %}
-  <hr class="border-secondary my-4">
-  <h5 class="text-white">Analiz Sonucu — Hafta {{ sonuc.hafta }}</h5>
-  <div class="row g-3 mt-1">
-    <div class="col-6 col-md-3">
-      <div class="card bg-dark border-secondary text-white text-center p-3">
-        <div class="small text-muted">VKİ</div>
-        <div class="fs-4 fw-bold">{{ sonuc.vki }}</div>
-        <div class="small">{{ sonuc.vki_kategori }}</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card bg-dark border-secondary text-white text-center p-3">
-        <div class="small text-muted">BMR</div>
-        <div class="fs-4 fw-bold">{{ sonuc.bmr }}</div>
-        <div class="small">kal/gün</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card bg-dark border-secondary text-white text-center p-3">
-        <div class="small text-muted">TDEE</div>
-        <div class="fs-4 fw-bold">{{ sonuc.tdee }}</div>
-        <div class="small">kal/gün</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card bg-dark border-secondary text-white text-center p-3">
-        <div class="small text-muted">Hedef Kalori</div>
-        <div class="fs-4 fw-bold">{{ sonuc.hedef_kalori }}</div>
-        <div class="small">{{ sonuc.kalori_aciklamasi }}</div>
-      </div>
-    </div>
-  </div>
+  <div class="tab-content" id="fitnessTabContent">
 
-  <div class="row g-3 mt-1">
-    <div class="col-4 text-center">
-      <div class="card bg-dark border-secondary text-white p-3">
-        <div class="small text-muted">Protein</div>
-        <div class="fw-bold">{{ sonuc.protein_g }} g</div>
+    <!-- ══════════ TAB 1: ANALİZ ══════════ -->
+    <div class="tab-pane fade {% if show_tab == 'analiz' %}show active{% endif %}" id="analiz" role="tabpanel">
+
+      <form method="POST" action="/fitness" id="analizForm">
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-md-2">
+            <label class="form-label text-muted small">Boy (cm)</label>
+            <input type="number" name="boy" class="form-control" step="0.1"
+                   value="{{ profil.boy if profil else '' }}" placeholder="175" required>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label text-muted small">Kilo (kg)</label>
+            <input type="number" name="kilo" class="form-control" step="0.1"
+                   value="{{ profil.kilo if profil else '' }}" placeholder="75" required>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label text-muted small">Yaş</label>
+            <input type="number" name="yas" class="form-control"
+                   value="{{ profil.yas if profil else '' }}" placeholder="25" required>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label text-muted small">Cinsiyet</label>
+            <select name="cinsiyet" class="form-select">
+              <option value="Erkek" {% if profil and profil.cinsiyet == 'Erkek' %}selected{% endif %}>Erkek</option>
+              <option value="Kadın" {% if profil and profil.cinsiyet == 'Kadın' %}selected{% endif %}>Kadın</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-muted small">Başlangıç Tarihi</label>
+            <input type="date" name="baslangic_tarihi" class="form-control"
+                   value="{{ profil.baslangic_tarihi if profil else '' }}">
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-muted small">Aktivite Seviyesi</label>
+            <select name="aktivite" class="form-select">
+              {% for a in aktiviteler %}
+              <option value="{{ a }}" {% if profil and profil.aktivite == a %}selected{% endif %}>{{ a }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label text-muted small">Hedef</label>
+            <select name="hedef" class="form-select">
+              {% for h in hedefler %}
+              <option value="{{ h }}" {% if profil and profil.hedef == h %}selected{% endif %}>{{ h }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label text-muted small">Seviye</label>
+            <select name="seviye" class="form-select">
+              {% for s in seviyeler %}
+              <option value="{{ s }}" {% if profil and profil.seviye == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Analiz Et & Kaydet</button>
+      </form>
+
+      {% if sonuc %}
+      <hr class="border-secondary my-4">
+      <div class="row g-3">
+        <div class="col-6 col-md-3"><div class="fitness-stat-card text-center">
+          <div class="small text-muted">VKİ</div>
+          <div class="fs-3 fw-bold" style="color:{{ sonuc.vki_renk }}">{{ sonuc.vki }}</div>
+          <div class="small">{{ sonuc.vki_kategori }}</div>
+        </div></div>
+        <div class="col-6 col-md-3"><div class="fitness-stat-card text-center">
+          <div class="small text-muted">BMR</div>
+          <div class="fs-3 fw-bold text-white">{{ sonuc.bmr }}</div>
+          <div class="small text-muted">kal/gün</div>
+        </div></div>
+        <div class="col-6 col-md-3"><div class="fitness-stat-card text-center">
+          <div class="small text-muted">TDEE</div>
+          <div class="fs-3 fw-bold text-white">{{ sonuc.tdee }}</div>
+          <div class="small text-muted">kal/gün</div>
+        </div></div>
+        <div class="col-6 col-md-3"><div class="fitness-stat-card text-center">
+          <div class="small text-muted">Hedef Kalori</div>
+          <div class="fs-3 fw-bold text-primary">{{ sonuc.hedef_kalori }}</div>
+          <div class="small text-muted">{{ sonuc.kalori_aciklamasi }}</div>
+        </div></div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-4"><div class="fitness-macro-card text-center">
+          <div class="small text-muted">Protein</div>
+          <div class="fw-bold text-warning fs-5">{{ sonuc.protein_g }}g</div>
+        </div></div>
+        <div class="col-4"><div class="fitness-macro-card text-center">
+          <div class="small text-muted">Karbonhidrat</div>
+          <div class="fw-bold text-info fs-5">{{ sonuc.karb_g }}g</div>
+        </div></div>
+        <div class="col-4"><div class="fitness-macro-card text-center">
+          <div class="small text-muted">Yağ</div>
+          <div class="fw-bold text-success fs-5">{{ sonuc.yag_g }}g</div>
+        </div></div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <div class="fitness-stat-card">
+            <div class="small text-muted mb-1">Günlük Su İhtiyacı</div>
+            <div class="fw-bold text-white fs-5">{{ sonuc.su_lt }} L</div>
+            <div class="small text-muted mt-1">İdeal Kilo: {{ sonuc.ideal_alt }} – {{ sonuc.ideal_ust }} kg</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="fitness-stat-card">
+            <div class="small text-muted mb-1">VKİ Tavsiyesi</div>
+            <div class="small text-white">{{ sonuc.vki_tavsiye }}</div>
+          </div>
+        </div>
+      </div>
+
+      {% if ilerleme %}
+      <div class="alert alert-secondary mt-3 small">
+        <strong>İlerleme:</strong> {{ ilerleme.gun_fark }} günde
+        {{ "+" if ilerleme.kilo_fark > 0 else "" }}{{ ilerleme.kilo_fark }} kg —
+        {{ ilerleme.kayit_sayisi }} kayıt
+      </div>
+      {% endif %}
+
+      {% if gecmis %}
+      <div class="mt-3">
+        <div class="small text-muted mb-2">Son Ölçümler</div>
+        <div class="table-responsive">
+          <table class="table table-dark table-sm table-bordered">
+            <thead><tr><th>Tarih</th><th>Kilo</th><th>VKİ</th><th>Hedef Kal.</th></tr></thead>
+            <tbody>
+              {% for k in gecmis %}
+              <tr><td>{{ k.tarih }}</td><td>{{ k.kilo }} kg</td><td>{{ k.vki }}</td><td>{{ k.hedef_kalori }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- ══════════ TAB 2: PROGRAM ══════════ -->
+    <div class="tab-pane fade {% if show_tab == 'program' %}show active{% endif %}" id="program" role="tabpanel">
+      {% if sonuc %}
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+          <h5 class="text-white mb-1">{{ sonuc.program_adi }}</h5>
+          <p class="text-muted small mb-0">{{ sonuc.program_gunler }}</p>
+        </div>
+        <button class="btn btn-success btn-sm" id="btnAntrenmanTamamla">
+          Antrenmanı Tamamla
+        </button>
+      </div>
+
+      <div class="row g-3" id="egzersizListesi">
+        {% for eg in sonuc.program_liste %}
+        {% set isim = eg[0] %}
+        {% set setler = eg[1] %}
+        {% set ipucu = eg[2] %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="egzersiz-karti" data-egzersiz="{{ isim|lower }}">
+            <div class="egzersiz-resim-alan">
+              <img class="egzersiz-resim" src="" alt="{{ isim }}"
+                   data-isim="{{ isim }}"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <div class="egzersiz-placeholder" style="display:none">
+                <i class="bi bi-person-arms-up fs-1 text-muted"></i>
+              </div>
+            </div>
+            <div class="egzersiz-bilgi p-3">
+              <div class="form-check mb-1">
+                <input class="form-check-input egzersiz-cb" type="checkbox"
+                       value="{{ isim }}" id="eg_{{ loop.index }}">
+                <label class="form-check-label fw-semibold text-white small" for="eg_{{ loop.index }}">
+                  {{ isim }}
+                </label>
+              </div>
+              {% if setler %}
+              <span class="badge bg-primary mb-1">{{ setler }}</span>
+              {% endif %}
+              {% if ipucu %}
+              <p class="text-muted small mb-0 mt-1">{{ ipucu }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="fitness-stat-card mt-4">
+        <div class="small text-muted mb-1">Antrenman Tavsiyesi</div>
+        <div class="small text-white">{{ sonuc.tavsiye }}</div>
+        {% if sonuc.program_dinlenme %}
+        <div class="small text-warning mt-1">{{ sonuc.program_dinlenme }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Antrenman Tamamla Modal -->
+      <div class="modal fade" id="modalAntrenman" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+              <h6 class="modal-title">Antrenmanı Kaydet</h6>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label small text-muted">Antrenman Süresi (dakika)</label>
+                <input type="number" id="antrenmanSure" class="form-control" value="45" min="1" max="300">
+              </div>
+              <p class="small text-muted" id="antrenmanTamamOzet"></p>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">İptal</button>
+              <button type="button" class="btn btn-success btn-sm" id="btnAntrenmanKaydet">Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
+      <div class="text-center py-5">
+        <i class="bi bi-person-arms-up display-4 text-muted"></i>
+        <p class="text-muted mt-3">Önce Analiz sekmesinden bilgilerini gir.</p>
+        <a href="#analiz" class="btn btn-primary btn-sm"
+           data-bs-toggle="tab" data-bs-target="#analiz">Analiz Sekmesine Git</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ══════════ TAB 3: TAKİP ══════════ -->
+    <div class="tab-pane fade" id="takip" role="tabpanel">
+      <div class="row g-4">
+
+        <!-- Su Takibi -->
+        <div class="col-12 col-md-6">
+          <div class="fitness-stat-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-white mb-0">Su Takibi</h6>
+              <span class="text-muted small" id="suLt">{{ (su_bugun * 0.25)|round(2) }} L</span>
+            </div>
+
+            <div class="su-bardaklar d-flex flex-wrap gap-2 mb-3" id="suBardaklar">
+              {% for i in range(1, 9) %}
+              <button class="su-bardak {% if i <= su_bugun %}dolu{% endif %}"
+                      onclick="suBardakTikla({{ i }})" title="{{ i * 250 }}ml">
+                <i class="bi bi-cup-straw{% if i <= su_bugun %}-fill{% endif %}"></i>
+                <span class="small">{{ i }}</span>
+              </button>
+              {% endfor %}
+            </div>
+
+            <div class="progress mb-2" style="height:10px;background:#1a1a2e">
+              <div class="progress-bar bg-info" id="suProgress"
+                   style="width:{{ [su_bugun / 8 * 100, 100]|min }}%"></div>
+            </div>
+            <div class="d-flex justify-content-between small text-muted">
+              <span id="suAdet">{{ su_bugun }} / 8 bardak</span>
+              <span>Hedef: 2.0 L</span>
+            </div>
+            <div class="mt-2 d-flex gap-2">
+              <button class="btn btn-outline-info btn-sm" onclick="suGuncelle(-1)">- Çıkar</button>
+              <button class="btn btn-info btn-sm" onclick="suGuncelle(1)">+ Bardak Ekle</button>
+            </div>
+
+            {% if su_gecmis %}
+            <div class="mt-3">
+              <div class="small text-muted mb-2">Son 7 Gün</div>
+              <div class="d-flex gap-1 align-items-end" style="height:50px">
+                {% for tarih, adet in su_gecmis.items() %}
+                <div class="flex-fill text-center" title="{{ tarih }}: {{ adet }} bardak">
+                  <div class="bg-info rounded-top" style="height:{{ [adet / 8 * 40, 40]|min }}px; min-height:4px"></div>
+                  <div class="text-muted" style="font-size:9px">{{ tarih[-5:] }}</div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Antrenman Takibi -->
+        <div class="col-12 col-md-6">
+          <div class="fitness-stat-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-white mb-0">Antrenman Takibi</h6>
+              <span class="badge bg-warning text-dark">{{ seri }} Gün Seri</span>
+            </div>
+
+            {% if antrenman_gecmis %}
+            <div class="list-group list-group-flush">
+              {% for a in antrenman_gecmis %}
+              <div class="list-group-item bg-dark text-white border-secondary py-2 px-0">
+                <div class="d-flex justify-content-between">
+                  <span class="small fw-semibold">{{ a.tarih }}</span>
+                  <span class="small text-muted">{{ a.sure }} dk</span>
+                </div>
+                <div class="small text-muted">{{ a.program or "Genel Antrenman" }}</div>
+                {% if a.egzersizler %}
+                <div class="small text-success">{{ a.egzersizler|join(", ") }}</div>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted small">Henüz antrenman kaydı yok. Program sekmesinden tamamla.</p>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-4 text-center">
-      <div class="card bg-dark border-secondary text-white p-3">
-        <div class="small text-muted">Karbonhidrat</div>
-        <div class="fw-bold">{{ sonuc.karb_g }} g</div>
+
+    <!-- ══════════ TAB 4: HATIRLATICI ══════════ -->
+    <div class="tab-pane fade" id="hatirlatici" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-12 col-md-6">
+          <div class="fitness-stat-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-white mb-0">Bildirim İzni</h6>
+              <button class="btn btn-outline-warning btn-sm" id="btnBildirimIzni" onclick="bildirimIzniIste()">
+                İzin Ver
+              </button>
+            </div>
+            <p class="small text-muted" id="bildirimDurumu">Bildirim durumu kontrol ediliyor...</p>
+
+            <hr class="border-secondary">
+            <h6 class="text-white mb-3">Yeni Hatırlatıcı</h6>
+            <div class="mb-2">
+              <select id="hatTur" class="form-select form-select-sm">
+                <option value="su">Su İçme</option>
+                <option value="antrenman">Antrenman</option>
+                <option value="beslenme">Beslenme</option>
+                <option value="uyku">Uyku</option>
+                <option value="genel">Genel</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <input type="time" id="hatSaat" class="form-control form-control-sm" value="09:00">
+            </div>
+            <div class="mb-3">
+              <input type="text" id="hatMesaj" class="form-control form-control-sm"
+                     placeholder="Hatırlatıcı mesajı...">
+            </div>
+            <button class="btn btn-primary btn-sm w-100" onclick="hatirlaticiEkle()">Ekle</button>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="fitness-stat-card">
+            <h6 class="text-white mb-3">Aktif Hatırlatıcılar</h6>
+            <div id="hatirlaticiListe">
+              {% if hatirlaticilar %}
+                {% for h in hatirlaticilar %}
+                <div class="hatirlatici-karti d-flex justify-content-between align-items-center mb-2"
+                     data-id="{{ h.id }}">
+                  <div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-secondary">{{ h.saat }}</span>
+                      <span class="small text-white">{{ h.mesaj }}</span>
+                    </div>
+                    <div class="small text-muted">{{ h.tur }}</div>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-outline-secondary btn-sm py-0 px-1"
+                            onclick="hatirlaticiToggle('{{ h.id }}')">
+                      {{ "Durdur" if h.aktif else "Başlat" }}
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm py-0 px-1"
+                            onclick="hatirlaticiSil('{{ h.id }}')">✕</button>
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+              <p class="text-muted small">Henüz hatırlatıcı yok.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-4 text-center">
-      <div class="card bg-dark border-secondary text-white p-3">
-        <div class="small text-muted">Yağ</div>
-        <div class="fw-bold">{{ sonuc.yag_g }} g</div>
+
+    <!-- ══════════ TAB 5: MOTİVASYON ══════════ -->
+    <div class="tab-pane fade" id="motivasyon" role="tabpanel">
+      <div class="row g-4 justify-content-center">
+        <div class="col-12 col-md-8">
+
+          <!-- Günlük Söz -->
+          <div class="motivasyon-karti text-center p-4 mb-4">
+            <div class="text-warning mb-2 small">Günün Sözü</div>
+            <blockquote class="fs-5 fw-semibold text-white fst-italic">
+              "{{ motivasyon_soz }}"
+            </blockquote>
+          </div>
+
+          <!-- Seri & İstatistikler -->
+          <div class="row g-3 mb-4">
+            <div class="col-4 text-center">
+              <div class="fitness-stat-card">
+                <div class="fs-2 fw-bold text-warning">{{ seri }}</div>
+                <div class="small text-muted">Gün Seri</div>
+              </div>
+            </div>
+            <div class="col-4 text-center">
+              <div class="fitness-stat-card">
+                <div class="fs-2 fw-bold text-info">{{ su_bugun }}</div>
+                <div class="small text-muted">Bugün Su</div>
+              </div>
+            </div>
+            <div class="col-4 text-center">
+              <div class="fitness-stat-card">
+                {% if sonuc %}
+                <div class="fs-2 fw-bold text-success">{{ sonuc.hafta }}</div>
+                {% else %}
+                <div class="fs-2 fw-bold text-success">—</div>
+                {% endif %}
+                <div class="small text-muted">Program Haftası</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Motivasyonel Görev Önerileri -->
+          <div class="fitness-stat-card">
+            <h6 class="text-white mb-3">Bugünün Görevleri</h6>
+            <div id="gunlukGorevler" class="list-group list-group-flush">
+              <div class="list-group-item bg-dark text-white border-secondary d-flex align-items-center gap-2">
+                <input type="checkbox" class="form-check-input" id="gv1" onchange="gorevTamamla(this, 'antrenman')">
+                <label for="gv1" class="small mb-0">Antrenmanını tamamla</label>
+              </div>
+              <div class="list-group-item bg-dark text-white border-secondary d-flex align-items-center gap-2">
+                <input type="checkbox" class="form-check-input" id="gv2" onchange="gorevTamamla(this, 'su')">
+                <label for="gv2" class="small mb-0">8 bardak su iç</label>
+              </div>
+              <div class="list-group-item bg-dark text-white border-secondary d-flex align-items-center gap-2">
+                <input type="checkbox" class="form-check-input" id="gv3" onchange="gorevTamamla(this, 'beslenme')">
+                <label for="gv3" class="small mb-0">Hedef kalorini uygula</label>
+              </div>
+              <div class="list-group-item bg-dark text-white border-secondary d-flex align-items-center gap-2">
+                <input type="checkbox" class="form-check-input" id="gv4" onchange="gorevTamamla(this, 'uyku')">
+                <label for="gv4" class="small mb-0">7-8 saat uyu</label>
+              </div>
+            </div>
+            <div class="mt-3 text-center">
+              <div class="small text-muted mb-1">Bugünkü tamamlanma</div>
+              <div class="progress" style="height:8px;background:#1a1a2e">
+                <div class="progress-bar bg-success" id="gunlukProgress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="card bg-dark border-secondary text-white mt-3 p-3">
-    <div class="small text-muted mb-1">Su İhtiyacı</div>
-    <div class="fw-bold">{{ sonuc.su_lt }} litre/gün</div>
-    <hr class="border-secondary">
-    <div class="small text-muted mb-1">VKİ Tavsiyesi</div>
-    <div class="small">{{ sonuc.vki_tavsiye }}</div>
-  </div>
-
-  <div class="card bg-dark border-secondary text-white mt-3 p-3">
-    <div class="fw-bold mb-2">{{ sonuc.program_adi }}</div>
-    <div class="small text-muted mb-2">{{ sonuc.program_gunler }}</div>
-    <ul class="list-group list-group-flush">
-      {% for egzersiz in sonuc.program_liste %}
-      <li class="list-group-item bg-dark text-white border-secondary small">
-        {% if egzersiz[0] %}{{ egzersiz[0] }}{% endif %}
-        {% if egzersiz[1] %} — <span class="text-muted">{{ egzersiz[1] }}</span>{% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-    <div class="small mt-2 text-muted">{{ sonuc.tavsiye }}</div>
-  </div>
-  {% endif %}
-
-  {% if gecmis %}
-  <hr class="border-secondary my-4">
-  <h5 class="text-white">Son Kayıtlar</h5>
-  <table class="table table-dark table-sm table-bordered mt-2">
-    <thead><tr><th>Tarih</th><th>Kilo</th><th>VKİ</th><th>Hedef Kal.</th></tr></thead>
-    <tbody>
-      {% for kayit in gecmis %}
-      <tr>
-        <td>{{ kayit.tarih }}</td>
-        <td>{{ kayit.kilo }} kg</td>
-        <td>{{ kayit.vki }}</td>
-        <td>{{ kayit.hedef_kalori }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% if ilerleme %}
-  <div class="alert alert-secondary small">
-    <strong>İlerleme:</strong>
-    {{ ilerleme.gun_fark }} günde kilo değişimi:
-    <strong>{{ "+" if ilerleme.kilo_fark > 0 else "" }}{{ ilerleme.kilo_fark }} kg</strong>
-    ({{ ilerleme.kayit_sayisi }} kayıt)
-  </div>
-  {% endif %}
-  {% endif %}
+  </div><!-- /tab-content -->
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const SHOW_TAB = "{{ show_tab }}";
+  const SU_BUGUN = {{ su_bugun }};
+  const PROGRAM_ADI = "{{ sonuc.program_adi if sonuc else '' }}";
+  const HATIRLATICILAR = {{ hatirlaticilar|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/fitness.js') }}"></script>
 {% endblock %}
