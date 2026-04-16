@@ -30,17 +30,27 @@
                 }
             ],
             "su_kayitlari": {
-                "2026-04-09": 9
+                "2026-04-09": 9,
+                "2026-04-10": 8
             },
             "hatirlaticilar": [
                 {
+                    "aktif": true,
                     "id": "1775724472498",
-                    "tur": "su",
-                    "saat": "12:00",
                     "mesaj": "su iç",
+                    "saat": "12:00",
+                    "tur": "su"
+                },
+                {
+                    "id": "1775995535791",
+                    "tur": "su",
+                    "saat": "15:06",
+                    "mesaj": "Alalkasl",
                     "aktif": true
                 }
-            ]
+            ],
+            "telefon": "5358520918",
+            "notlar": "Spaşai"
         }
     }
 }
