@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" content="#0f0f1a" />
   <meta name="description" content="JKB — Kişisel Yönetim ve Fitness Takip Uygulaması" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -145,6 +145,7 @@
     function temaToggle() {
       const light = document.body.classList.toggle('light-mode');
       localStorage.setItem('jkb_tema', light ? 'light' : 'dark');
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', light ? '#eef1f7' : '#0f0f1a');
       document.querySelectorAll('[id^="temaIkon"]').forEach(el => {
         el.className = light ? 'bi bi-moon-stars-fill' : 'bi bi-sun';
       });
@@ -152,6 +153,7 @@
     (function initTema() {
       if (localStorage.getItem('jkb_tema') === 'light') {
         document.body.classList.add('light-mode');
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#eef1f7');
         document.querySelectorAll('[id^="temaIkon"]').forEach(el => {
           el.className = 'bi bi-moon-stars-fill';
         });

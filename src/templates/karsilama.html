@@ -7,23 +7,19 @@
   <img src="{{ url_for('static', filename='logo.png') }}" alt="JKB Logo"
        class="jkb-hero-logo mb-4 hero-logo-float" />
 
-  <p class="text-muted fst-italic mb-2" style="font-size:clamp(13px,2.5vw,16px);letter-spacing:.5px">
-    Sadece bir uygulama mı sanıyorsunuz?
-  </p>
+  <div class="hero-copy-wrap">
+    <div class="hero-pill mb-3">Kişisel yönetim • fitness • odak</div>
+    <h1 class="hero-brand-title fw-black mb-3" style="font-size:clamp(30px,7vw,58px);line-height:1.04">
+      <span class="text-gradient">Daha düzenli.</span><br>
+      Daha güçlü.
+    </h1>
+    <p class="hero-copy mb-0">
+      JKB; gününü, bedenini ve hedeflerini tek bir sade akışta toplar.
+      <span class="hero-copy-accent">Başlamak için doğru yerdesiniz.</span>
+    </p>
+  </div>
 
-  <div class="hero-divider my-3"></div>
-
-  <h1 class="hero-brand-title fw-black mb-1" style="font-size:clamp(28px,7vw,54px);line-height:1.1">
-    <span class="text-gradient">Hayatınızın</span><br>
-    Komuta Merkezi.
-  </h1>
-
-  <p class="text-secondary mb-5 mt-3" style="font-size:clamp(13px,2vw,15px);max-width:380px;line-height:1.7">
-    Fitness koçu, görev yöneticisi, not defteri ve çok daha fazlası.<br>
-    <em style="color:#e94560;font-style:italic">Yanıldığınızı fark edeceksiniz.</em>
-  </p>
-
-  <div class="d-flex flex-column flex-sm-row gap-3">
+  <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
     <a href="/giris" class="btn btn-primary btn-lg px-5 shadow-sm">
       <i class="bi bi-box-arrow-in-right me-2"></i>Giriş Yap
     </a>
@@ -32,8 +28,6 @@
     </a>
   </div>
 
-  <p class="text-muted mt-5 small" style="opacity:.4">Güvenli · Ücretsiz · Kişisel</p>
+  <p class="text-muted mt-4 small hero-footnote">Güvenli · Ücretsiz · Kişisel</p>
 </div>
-
-<div class="picak-imza">Made By Picak</div>
 {% endblock %}

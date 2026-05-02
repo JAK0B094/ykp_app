@@ -218,6 +218,32 @@ function hatirlaticiListeGuncelle() {
   `).join('');
 }
 
+function gunlukGorevleriYukle() {
+  const tamamlanan = JSON.parse(localStorage.getItem('jkb_gorevler') || '{}');
+  document.querySelectorAll('#gunlukGorevler .form-check-input').forEach(cb => {
+    cb.checked = !!tamamlanan[cb.id];
+  });
+  gorevIlerlemesiniGuncelle();
+}
+
+function gorevTamamla(cb, tur) {
+  const tamamlanan = JSON.parse(localStorage.getItem('jkb_gorevler') || '{}');
+  tamamlanan[cb.id] = cb.checked;
+  localStorage.setItem('jkb_gorevler', JSON.stringify(tamamlanan));
+  gorevIlerlemesiniGuncelle();
+  if (cb.checked) {
+    bildirimGonder('Görev Tamamlandı', `${tur} görevi işaretlendi.`, '✅');
+  }
+}
+
+function gorevIlerlemesiniGuncelle() {
+  const kutular = [...document.querySelectorAll('#gunlukGorevler .form-check-input')];
+  const tamamlanan = kutular.filter(cb => cb.checked).length;
+  const pct = kutular.length ? (tamamlanan / kutular.length) * 100 : 0;
+  const bar = document.getElementById('gunlukProgress');
+  if (bar) bar.style.width = pct + '%';
+}
+
 function hatirlaticiKontrolunuBaslat() {
   setInterval(hatirlaticiKontrolEt, 60000);
   hatirlaticiKontrolEt();
