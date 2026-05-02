@@ -19,9 +19,11 @@ app.register_blueprint(fitness)
 app.register_blueprint(gorevler)
 app.register_blueprint(notlar)
 
+
 @app.route("/")
 def karsilama():
     return render_template("karsilama.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
