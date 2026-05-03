@@ -114,6 +114,22 @@ def admin_giris():
     return render_template("admin_giris.html", hata=hata)
 
 
+@admin_bp.route("/kullanici-girisi")
+def kullanici_ile_giris():
+    """Profil sayfasından admin paneline tek tıkla geçiş (şifre gerektirmez)."""
+    kullanici_adi = session.get("kullanici")
+    if not kullanici_adi:
+        return redirect(url_for("auth.giris"))
+    data = _veri_oku()
+    rol = data.get("kullanicilar", {}).get(kullanici_adi, {}).get("rol", "user")
+    if rol != "admin":
+        flash("Bu sayfaya erişim yetkiniz yok.", "danger")
+        return redirect(url_for("panel.profil"))
+    session["admin_giris"] = True
+    session["admin_giris_zamani"] = datetime.datetime.now().isoformat()
+    return redirect(url_for("admin.admin_panel"))
+
+
 @admin_bp.route("/cikis")
 def admin_cikis():
     session.pop("admin_giris", None)

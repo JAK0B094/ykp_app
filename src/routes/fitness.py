@@ -15,8 +15,32 @@ AKTIVITELER = [
     "Çok Aktif (6-7 gün/hafta)",
     "Profesyonel Sporcu",
 ]
-HEDEFLER = ["Fit Kal", "Kilo Ver", "Hızlı Kilo Ver", "Kas Yap", "Hızlı Kas Yap", "Kuvvet Kazan"]
+
+HEDEFLER = [
+    "Fit Kal",
+    "Kilo Ver",
+    "Hızlı Kilo Ver",
+    "Kas Yap",
+    "Hızlı Kas Yap",
+    "Vücut Geliştirme",
+    "Kuvvet Kazan",
+    "Güç + Hipertrofi",
+    "Kardiyo & Dayanıklılık",
+]
+
 SEVIYELER = ["Başlangıç", "Orta", "İleri"]
+
+EKIPMANLAR = [
+    "Spor Salonu (Tam Ekipman)",
+    "Ev (Dumbbell + Bant)",
+    "Yalnızca Vücut Ağırlığı",
+]
+
+GUN_SAYILARI = [
+    "3 Gün/Hafta",
+    "4 Gün/Hafta",
+    "5-6 Gün/Hafta",
+]
 
 MOTIVASYON_SOZLERI = [
     "Bugün acı çek, yarın kazanman için.",
@@ -58,14 +82,15 @@ MOTIVASYON_SOZLERI = [
 
 
 def _sonuc_profil_ile(profil):
-    """Kayıtlı profilden analiz sonucu oluştur."""
     if not profil:
         return None
     try:
         sonuc = FitnessZekasi.analiz_et(
             profil["boy"], profil["kilo"], profil["yas"],
             profil["cinsiyet"], profil["seviye"], profil["hedef"],
-            profil["aktivite"], profil.get("baslangic_tarihi", "")
+            profil["aktivite"], profil.get("baslangic_tarihi", ""),
+            profil.get("ekipman", "Spor Salonu (Tam Ekipman)"),
+            profil.get("gun_sayisi", "3 Gün/Hafta"),
         )
         sonuc.update({
             "kilo": profil["kilo"], "boy": profil["boy"],
@@ -89,16 +114,20 @@ def fitness_sayfasi():
 
     if request.method == "POST":
         try:
-            boy = float(request.form["boy"])
-            kilo = float(request.form["kilo"])
-            yas = int(request.form["yas"])
+            boy      = float(request.form["boy"])
+            kilo     = float(request.form["kilo"])
+            yas      = int(request.form["yas"])
             cinsiyet = request.form["cinsiyet"]
             aktivite = request.form["aktivite"]
-            hedef = request.form["hedef"]
-            seviye = request.form["seviye"]
+            hedef    = request.form["hedef"]
+            seviye   = request.form["seviye"]
+            ekipman  = request.form.get("ekipman", "Spor Salonu (Tam Ekipman)")
+            gun_sayisi = request.form.get("gun_sayisi", "3 Gün/Hafta")
             baslangic = request.form.get("baslangic_tarihi", "") or profil.get("baslangic_tarihi", "")
 
-            sonuc = FitnessZekasi.analiz_et(boy, kilo, yas, cinsiyet, seviye, hedef, aktivite, baslangic)
+            sonuc = FitnessZekasi.analiz_et(
+                boy, kilo, yas, cinsiyet, seviye, hedef, aktivite, baslangic, ekipman, gun_sayisi
+            )
             sonuc.update({"kilo": kilo, "boy": boy, "yas": yas,
                           "cinsiyet": cinsiyet, "aktivite": aktivite})
 
@@ -107,6 +136,8 @@ def fitness_sayfasi():
                 "cinsiyet": cinsiyet, "aktivite": aktivite,
                 "hedef": hedef, "seviye": seviye,
                 "baslangic_tarihi": baslangic,
+                "ekipman": ekipman,
+                "gun_sayisi": gun_sayisi,
             }
             db.fitness_profil_kaydet(kullanici, yeni_profil)
             profil = yeni_profil
@@ -115,6 +146,7 @@ def fitness_sayfasi():
                 "tarih": datetime.date.today().isoformat(),
                 "kilo": kilo, "vki": sonuc["vki"],
                 "hedef_kalori": sonuc["hedef_kalori"],
+                "bf_yuzde": sonuc.get("bf_yuzde", 0),
             }
             db.fitness_verisi_kaydet(kullanici, kayit)
             gecmis = db.fitness_verisi_getir(kullanici)
@@ -122,7 +154,6 @@ def fitness_sayfasi():
         except (ValueError, KeyError) as e:
             hata = f"Lütfen tüm alanları doldurun. ({e})"
 
-    # Profil varsa ama form gönderilmediyse profil üzerinden program yükle
     if sonuc is None and profil:
         sonuc = _sonuc_profil_ile(profil)
         if sonuc and request.method == "GET":
@@ -130,19 +161,14 @@ def fitness_sayfasi():
 
     ilerleme = FitnessZekasi.ilerleme_analizi(gecmis)
 
-    # Su takibi
     bugun_str = datetime.date.today().isoformat()
-    su_bugun = db.su_getir(kullanici, bugun_str)
+    su_bugun  = db.su_getir(kullanici, bugun_str)
     su_gecmis = db.su_gecmis_getir(kullanici, 7)
 
-    # Antrenman takibi
     antrenman_gecmis = db.antrenman_gecmis_getir(kullanici, 5)
     seri = db.antrenman_seri_getir(kullanici)
-
-    # Hatırlatıcılar
     hatirlaticilar = db.hatirlatici_getir(kullanici)
 
-    # Günlük motivasyon
     h = int(hashlib.md5(f"{kullanici}{bugun_str}".encode()).hexdigest(), 16)
     motivasyon_soz = MOTIVASYON_SOZLERI[h % len(MOTIVASYON_SOZLERI)]
 
@@ -151,7 +177,9 @@ def fitness_sayfasi():
         sonuc=sonuc, profil=profil,
         gecmis=gecmis[-5:][::-1],
         ilerleme=ilerleme, hata=hata,
-        aktiviteler=AKTIVITELER, hedefler=HEDEFLER, seviyeler=SEVIYELER,
+        aktiviteler=AKTIVITELER, hedefler=HEDEFLER,
+        seviyeler=SEVIYELER, ekipmanlar=EKIPMANLAR,
+        gun_sayilari=GUN_SAYILARI,
         show_tab=show_tab,
         su_bugun=su_bugun, su_gecmis=su_gecmis,
         antrenman_gecmis=antrenman_gecmis, seri=seri,
@@ -160,8 +188,6 @@ def fitness_sayfasi():
         bugun=bugun_str,
     )
 
-
-# ── API Endpoint'leri ──────────────────────────────────────────────────────────
 
 @fitness.route("/api/fitness/su", methods=["GET", "POST"])
 @giris_gerekli

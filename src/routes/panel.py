@@ -54,7 +54,8 @@ def profil():
     return render_template("profil.html",
                            kullanici=kullanici,
                            eposta=bilgi.get("eposta", ""),
-                           telefon=bilgi.get("telefon", ""))
+                           telefon=bilgi.get("telefon", ""),
+                           _kullanici_rol=bilgi.get("rol", "user"))
 
 
 @panel.route("/profil/sifre", methods=["POST"])
@@ -71,7 +72,8 @@ def sifre_degistir():
 
     kwargs = dict(kullanici=kullanici,
                   eposta=bilgi.get("eposta", ""),
-                  telefon=bilgi.get("telefon", ""))
+                  telefon=bilgi.get("telefon", ""),
+                  _kullanici_rol=bilgi.get("rol", "user"))
 
     if yeni != yeni2:
         return render_template("profil.html", hata="Yeni şifreler uyuşmuyor!", **kwargs)

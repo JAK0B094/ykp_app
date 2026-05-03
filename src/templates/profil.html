@@ -12,6 +12,16 @@
       <div>
         <div class="fw-bold text-white fs-5">{{ kullanici }}</div>
         <div class="text-muted small">{{ eposta or "—" }}</div>
+        {% set rol = site_konfig._rol if site_konfig._rol else "" %}
+        {% if _kullanici_rol == 'admin' %}
+          <span class="badge mt-1" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);font-size:10px">
+            <i class="bi bi-shield-fill-check me-1"></i>Admin
+          </span>
+        {% elif _kullanici_rol == 'moderator' %}
+          <span class="badge mt-1" style="background:linear-gradient(135deg,#d97706,#f59e0b);color:#1a1a2e;font-size:10px">
+            <i class="bi bi-shield-check me-1"></i>Moderatör
+          </span>
+        {% endif %}
       </div>
     </div>
     <div class="row g-2">
@@ -46,6 +56,41 @@
       {% endif %}
     </div>
   </div>
+
+  <!-- Yetkili Panel Butonları -->
+  {% if _kullanici_rol == 'admin' %}
+  <div class="jkb-card mb-4" style="border:1px solid rgba(124,58,237,0.4);background:rgba(124,58,237,0.08)">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px">
+        <i class="bi bi-shield-fill-check text-white"></i>
+      </div>
+      <div>
+        <div class="fw-semibold text-white">Yönetici Paneli</div>
+        <div class="small text-muted">Tam yönetim yetkisi — tüm sisteme erişim</div>
+      </div>
+    </div>
+    <a href="/yonetici/kullanici-girisi" class="btn w-100 fw-semibold"
+       style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none">
+      <i class="bi bi-shield-fill-check me-2"></i>Yönetici Paneline Git
+    </a>
+  </div>
+  {% elif _kullanici_rol == 'moderator' %}
+  <div class="jkb-card mb-4" style="border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.08)">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#d97706,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:18px">
+        <i class="bi bi-shield-check" style="color:#1a1a2e"></i>
+      </div>
+      <div>
+        <div class="fw-semibold text-white">Moderatör Paneli</div>
+        <div class="small text-muted">Kullanıcı moderasyonu ve duyuru yönetimi</div>
+      </div>
+    </div>
+    <a href="/moderator/kullanici-girisi" class="btn w-100 fw-semibold"
+       style="background:linear-gradient(135deg,#d97706,#f59e0b);color:#1a1a2e;border:none">
+      <i class="bi bi-shield-check me-2"></i>Moderatör Paneline Git
+    </a>
+  </div>
+  {% endif %}
 
   <!-- QR Kodu -->
   <div class="jkb-card mb-4 text-center">
