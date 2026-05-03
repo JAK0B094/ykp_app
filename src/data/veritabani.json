@@ -1,83 +1,99 @@
 {
-    "kullanicilar": {
-        "ykp": {
-            "sifre": "949494",
-            "eposta": "yakup.picak@gmail.com",
-            "gorevler": [
-                {
-                    "id": "182189f3",
-                    "baslik": "Test görevi",
-                    "tamamlandi": false,
-                    "tarih": "2026-04-07"
-                }
-            ],
-            "fitness_profil": {
-                "boy": 180.0,
-                "kilo": 75.0,
-                "yas": 32,
-                "cinsiyet": "Erkek",
-                "aktivite": "Orta Aktif (3-5 gün/hafta)",
-                "hedef": "Kas Yap",
-                "seviye": "Başlangıç",
-                "baslangic_tarihi": "2026-05-03",
-                "ekipman": "Spor Salonu (Tam Ekipman)",
-                "gun_sayisi": "3 Gün/Hafta"
-            },
-            "fitness_gecmisi": [
-                {
-                    "tarih": "2026-04-07",
-                    "kilo": 82.0,
-                    "vki": 25.3,
-                    "hedef_kalori": 3106
-                },
-                {
-                    "tarih": "2026-05-03",
-                    "kilo": 82.0,
-                    "vki": 25.3,
-                    "hedef_kalori": 3056,
-                    "bf_yuzde": 20.6
-                },
-                {
-                    "tarih": "2026-05-03",
-                    "kilo": 82.0,
-                    "vki": 25.3,
-                    "hedef_kalori": 3056,
-                    "bf_yuzde": 20.6
-                },
-                {
-                    "tarih": "2026-05-03",
-                    "kilo": 75.0,
-                    "vki": 23.1,
-                    "hedef_kalori": 2916,
-                    "bf_yuzde": 18.9
-                }
-            ],
-            "su_kayitlari": {
-                "2026-04-09": 9,
-                "2026-04-10": 8
-            },
-            "hatirlaticilar": [
-                {
-                    "aktif": true,
-                    "id": "1775724472498",
-                    "mesaj": "su iç",
-                    "saat": "12:00",
-                    "tur": "su"
-                },
-                {
-                    "id": "1775995535791",
-                    "tur": "su",
-                    "saat": "15:06",
-                    "mesaj": "Alalkasl",
-                    "aktif": true
-                }
-            ],
-            "telefon": "5358520918",
-            "notlar": "Spaşai",
-            "rol": "admin",
-            "admin_token": "e6RPITZ0Q4VY69Ym",
-            "durum": "aktif",
-            "kilitli": false
+  "kullanicilar": {
+    "ykp": {
+      "sifre": "949494",
+      "eposta": "yakup.picak@gmail.com",
+      "gorevler": [
+        {
+          "id": "182189f3",
+          "baslik": "Test görevi",
+          "tamamlandi": false,
+          "tarih": "2026-04-07"
         }
+      ],
+      "fitness_profil": {
+        "boy": 180.0,
+        "kilo": 75.0,
+        "yas": 32,
+        "cinsiyet": "Erkek",
+        "aktivite": "Orta Aktif (3-5 gün/hafta)",
+        "hedef": "Kas Yap",
+        "seviye": "Başlangıç",
+        "baslangic_tarihi": "2026-05-03",
+        "ekipman": "Spor Salonu (Tam Ekipman)",
+        "gun_sayisi": "3 Gün/Hafta"
+      },
+      "fitness_gecmisi": [
+        {
+          "tarih": "2026-04-07",
+          "kilo": 82.0,
+          "vki": 25.3,
+          "hedef_kalori": 3106
+        },
+        {
+          "tarih": "2026-05-03",
+          "kilo": 82.0,
+          "vki": 25.3,
+          "hedef_kalori": 3056,
+          "bf_yuzde": 20.6
+        },
+        {
+          "tarih": "2026-05-03",
+          "kilo": 82.0,
+          "vki": 25.3,
+          "hedef_kalori": 3056,
+          "bf_yuzde": 20.6
+        },
+        {
+          "tarih": "2026-05-03",
+          "kilo": 75.0,
+          "vki": 23.1,
+          "hedef_kalori": 2916,
+          "bf_yuzde": 18.9
+        }
+      ],
+      "su_kayitlari": {
+        "2026-04-09": 9,
+        "2026-04-10": 8
+      },
+      "hatirlaticilar": [
+        {
+          "aktif": true,
+          "id": "1775724472498",
+          "mesaj": "su iç",
+          "saat": "12:00",
+          "tur": "su"
+        },
+        {
+          "id": "1775995535791",
+          "tur": "su",
+          "saat": "15:06",
+          "mesaj": "Alalkasl",
+          "aktif": true
+        }
+      ],
+      "telefon": "5358520918",
+      "notlar": "Spaşai",
+      "rol": "admin",
+      "admin_token": "e6RPITZ0Q4VY69Ym",
+      "durum": "aktif",
+      "kilitli": false
     }
+  },
+  "sistem_log": [
+    {
+      "zaman": "2026-05-03 11:21:31",
+      "olay": "Yeni Kayıt",
+      "detay": "'test_kontrol_9x' kayıt oldu — kontrol9x@test.com",
+      "seviye": "basari",
+      "kullanici": "test_kontrol_9x"
+    },
+    {
+      "zaman": "2026-05-03 11:21:31",
+      "olay": "Test Olayı",
+      "detay": "Kontrol amaçlı",
+      "seviye": "bilgi",
+      "kullanici": "sistem"
+    }
+  ]
 }
