@@ -50,14 +50,14 @@ body.light-mode .hero-copy { color: #1a1a2e; }
 
 /* ── Navbar ──────────────────────────────────────────────── */
 .jkb-navbar {
-  background-color: #ff8c00 !important;
+  background: linear-gradient(90deg, #8a4b12 0%, #b35f16 46%, #d77b22 100%) !important;
   border-bottom: 1px solid rgba(255,255,255,0.07);
   height: var(--jkb-nav-h);
   z-index: 1100;
 }
 
 .jkb-navbar .nav-link {
-  color: #ffffff !important;
+  color: #fff7ef !important;
   border-radius: 8px;
   padding: 6px 12px !important;
   transition: color .2s, background .2s;
@@ -66,11 +66,38 @@ body.light-mode .hero-copy { color: #1a1a2e; }
 .jkb-navbar .nav-link:hover,
 .jkb-navbar .nav-link.active {
   color: #fff !important;
-  background: rgba(0,0,0,0.12);
+  background: rgba(18, 28, 48, 0.18);
 }
 
 .jkb-navbar .navbar-brand img {
-  filter: brightness(0) invert(1);
+  filter: hue-rotate(175deg) saturate(2.2) brightness(0.95);
+}
+
+.nav-pill {
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+}
+
+.nav-pill-primary {
+  background: linear-gradient(135deg, #1f4f99, #2d6cdf);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.nav-pill-secondary {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.nav-pill-accent {
+  background: rgba(30, 75, 150, 0.25);
+  border-color: rgba(120, 180, 255, 0.22);
+}
+
+.nav-pill-danger {
+  background: rgba(82, 23, 10, 0.26);
+  border-color: rgba(255, 200, 170, 0.18);
 }
 
 /* ── Hero (Karşılama) ────────────────────────────────────── */
