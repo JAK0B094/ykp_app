@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Navbar Yöneticisi — JKB Admin</title>
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/admin.css" />
+  <style>
+    .drag-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(99,102,241,0.18);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: grab;
+      transition: background .15s, box-shadow .15s, transform .15s;
+      user-select: none;
+    }
+    .drag-item:active { cursor: grabbing; }
+    .drag-item.sortable-ghost {
+      opacity: 0.3;
+      background: rgba(99,102,241,0.15);
+      transform: scale(0.98);
+    }
+    .drag-item.sortable-chosen {
+      background: rgba(99,102,241,0.10);
+      box-shadow: 0 8px 32px rgba(99,102,241,0.25);
+    }
+    .drag-handle {
+      color: #94a3b8;
+      cursor: grab;
+      font-size: 18px;
+      padding: 0 6px;
+    }
+    .drag-handle:hover { color: #a5b4fc; }
+    .drag-item.disabled-link {
+      opacity: 0.45;
+      border-style: dashed;
+    }
+    .adm-badge-danger {
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+    }
+    .icon-preview {
+      font-size: 18px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(99,102,241,0.12);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .preview-navbar {
+      background: linear-gradient(90deg, #8a4b12 0%, #b35f16 46%, #d77b22 100%);
+      border-radius: 10px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .preview-pill {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff7ef;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .preview-pill.stil-primary { background: linear-gradient(135deg,#1f4f99,#2d6cdf); }
+    .preview-pill.stil-secondary { background: rgba(255,255,255,0.16); }
+    .preview-pill.stil-accent { background: rgba(30,75,150,0.25); }
+    .preview-pill.stil-danger { background: rgba(82,23,10,0.26); }
+  </style>
+</head>
+<body class="adm-body">
+  {% set active_page = 'navbar' %}
+  {% include "admin_sidebar.html" %}
+
+  <main class="adm-main">
+    <div class="adm-topbar">
+      <div>
+        <h1 class="adm-page-title"><i class="bi bi-list-ul me-2" style="color:#a5b4fc"></i>Navbar Yöneticisi</h1>
+        <div class="adm-page-sub">Menü linklerini sürükleyerek sırala, etiket/ikon düzenle, gizle/göster</div>
+      </div>
+      <div class="d-flex gap-2">
+        <form method="POST" action="/yonetici/navbar/sifirla" onsubmit="return confirm('Navbar varsayılana sıfırlansın mı?')">
+          <button type="submit" class="adm-btn-sm adm-btn-warning"><i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla</button>
+        </form>
+        <span class="adm-online-badge"><span class="adm-dot"></span> Canlı</span>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for cat, msg in messages %}
+      <div class="alert alert-{{ 'danger' if cat=='error' else cat }} alert-dismissible fade show mb-3">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Canlı Önizleme -->
+    <div class="adm-section mb-4">
+      <div class="adm-section-title mb-3"><i class="bi bi-eye me-2"></i>Canlı Önizleme <span class="adm-badge-sm ms-2">Kaydettikten sonra yansır</span></div>
+      <div class="preview-navbar" id="navbarOnizleme">
+        <div style="font-weight:800;color:#fff;font-size:15px;margin-right:8px">JKB</div>
+        {% for link in giris_links if link.aktif %}
+        <span class="preview-pill stil-{{ link.stil }}">
+          <i class="bi {{ link.icon }}"></i> {{ link.label }}
+        </span>
+        {% endfor %}
+      </div>
+      <div class="small text-secondary">Giriş yapmamış kullanıcılar için:</div>
+      <div class="preview-navbar mt-2" id="navbarOnizlemeCikis">
+        <div style="font-weight:800;color:#fff;font-size:15px;margin-right:8px">JKB</div>
+        {% for link in cikis_links if link.aktif %}
+        <span class="preview-pill stil-{{ link.stil }}">
+          <i class="bi {{ link.icon }}"></i> {{ link.label }}
+        </span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Giriş Yapılmış Linkler -->
+      <div class="col-12 col-xl-6">
+        <div class="adm-section">
+          <div class="adm-section-title mb-1"><i class="bi bi-person-check me-2"></i>Giriş Yapılmış Kullanıcı Menüsü</div>
+          <div class="adm-section-sub mb-3">Sürükle-bırak ile sırala</div>
+          <div id="girisListesi">
+            {% for link in giris_links %}
+            <div class="drag-item {% if not link.aktif %}disabled-link{% endif %}"
+                 data-id="{{ link.id }}"
+                 data-sadece-giris="true"
+                 data-sadece-cikis="false"
+                 data-href="{{ link.href }}">
+              <div class="d-flex align-items-center gap-3">
+                <span class="drag-handle"><i class="bi bi-grip-vertical"></i></span>
+                <div class="icon-preview"><i class="bi {{ link.icon }}"></i></div>
+                <div class="flex-fill">
+                  <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
+                    <input type="text" class="adm-input flex-fill drag-label" value="{{ link.label }}"
+                           placeholder="Etiket" style="padding:6px 10px;font-size:13px">
+                    <input type="text" class="adm-input drag-icon" value="{{ link.icon }}"
+                           placeholder="bi-icon" style="padding:6px 10px;font-size:12px;width:130px">
+                    <select class="adm-input drag-stil" style="padding:6px 8px;font-size:12px;width:110px">
+                      <option value="" {% if link.stil=='' %}selected{% endif %}>Normal</option>
+                      <option value="primary" {% if link.stil=='primary' %}selected{% endif %}>Mavi</option>
+                      <option value="secondary" {% if link.stil=='secondary' %}selected{% endif %}>Gri</option>
+                      <option value="accent" {% if link.stil=='accent' %}selected{% endif %}>Accent</option>
+                      <option value="danger" {% if link.stil=='danger' %}selected{% endif %}>Kırmızı</option>
+                    </select>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="adm-badge-sm">{{ link.href }}</span>
+                    <label class="d-flex align-items-center gap-2 mb-0" style="cursor:pointer">
+                      <input type="checkbox" class="drag-aktif" {% if link.aktif %}checked{% endif %}>
+                      <span style="font-size:12px;color:#94a3b8">Göster</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Giriş Yapılmamış Linkler -->
+      <div class="col-12 col-xl-6">
+        <div class="adm-section">
+          <div class="adm-section-title mb-1"><i class="bi bi-person-x me-2"></i>Misafir Kullanıcı Menüsü</div>
+          <div class="adm-section-sub mb-3">Sürükle-bırak ile sırala</div>
+          <div id="cikisListesi">
+            {% for link in cikis_links %}
+            <div class="drag-item {% if not link.aktif %}disabled-link{% endif %}"
+                 data-id="{{ link.id }}"
+                 data-sadece-giris="false"
+                 data-sadece-cikis="true"
+                 data-href="{{ link.href }}">
+              <div class="d-flex align-items-center gap-3">
+                <span class="drag-handle"><i class="bi bi-grip-vertical"></i></span>
+                <div class="icon-preview"><i class="bi {{ link.icon }}"></i></div>
+                <div class="flex-fill">
+                  <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
+                    <input type="text" class="adm-input flex-fill drag-label" value="{{ link.label }}"
+                           placeholder="Etiket" style="padding:6px 10px;font-size:13px">
+                    <input type="text" class="adm-input drag-icon" value="{{ link.icon }}"
+                           placeholder="bi-icon" style="padding:6px 10px;font-size:12px;width:130px">
+                    <select class="adm-input drag-stil" style="padding:6px 8px;font-size:12px;width:110px">
+                      <option value="" {% if link.stil=='' %}selected{% endif %}>Normal</option>
+                      <option value="primary" {% if link.stil=='primary' %}selected{% endif %}>Mavi</option>
+                      <option value="secondary" {% if link.stil=='secondary' %}selected{% endif %}>Gri</option>
+                      <option value="accent" {% if link.stil=='accent' %}selected{% endif %}>Accent</option>
+                      <option value="danger" {% if link.stil=='danger' %}selected{% endif %}>Kırmızı</option>
+                    </select>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="adm-badge-sm">{{ link.href }}</span>
+                    <label class="d-flex align-items-center gap-2 mb-0" style="cursor:pointer">
+                      <input type="checkbox" class="drag-aktif" {% if link.aktif %}checked{% endif %}>
+                      <span style="font-size:12px;color:#94a3b8">Göster</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kaydet Butonu -->
+    <div class="d-flex justify-content-end mt-4">
+      <button onclick="kaydet()" class="adm-btn-action adm-btn-primary" style="gap:8px">
+        <i class="bi bi-check-lg"></i> Navbar'ı Kaydet
+      </button>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script>
+    Sortable.create(document.getElementById('girisListesi'), {
+      animation: 200, handle: '.drag-handle', ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+      onEnd: () => updateIconPreviews()
+    });
+    Sortable.create(document.getElementById('cikisListesi'), {
+      animation: 200, handle: '.drag-handle', ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+      onEnd: () => updateIconPreviews()
+    });
+
+    document.querySelectorAll('.drag-icon').forEach(inp => {
+      inp.addEventListener('input', function() {
+        const preview = this.closest('.drag-item').querySelector('.icon-preview i');
+        preview.className = 'bi ' + this.value.trim();
+      });
+    });
+
+    document.querySelectorAll('.drag-aktif').forEach(cb => {
+      cb.addEventListener('change', function() {
+        this.closest('.drag-item').classList.toggle('disabled-link', !this.checked);
+      });
+    });
+
+    function collectList(listId, sadeceGiris, sadeceCikis) {
+      return [...document.querySelectorAll('#' + listId + ' .drag-item')].map((el, i) => ({
+        id: el.dataset.id,
+        href: el.dataset.href,
+        sadece_giris: sadeceGiris,
+        sadece_cikis: sadeceCikis,
+        siralama: i,
+        aktif: el.querySelector('.drag-aktif').checked,
+        label: el.querySelector('.drag-label').value.trim(),
+        icon: el.querySelector('.drag-icon').value.trim(),
+        stil: el.querySelector('.drag-stil').value,
+      }));
+    }
+
+    function kaydet() {
+      const giris = collectList('girisListesi', true, false);
+      const cikis = collectList('cikisListesi', false, true);
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/yonetici/navbar';
+      const inp = document.createElement('input');
+      inp.type = 'hidden';
+      inp.name = 'siralama_json';
+      inp.value = JSON.stringify([...giris, ...cikis]);
+      form.appendChild(inp);
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    function updateIconPreviews() {}
+  </script>
+</body>
+</html>

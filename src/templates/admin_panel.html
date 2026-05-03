@@ -11,24 +11,8 @@
   <link rel="stylesheet" href="/static/css/admin.css" />
 </head>
 <body class="adm-body">
-  <aside class="adm-sidebar">
-    <div class="adm-sidebar-brand">
-      <div class="adm-brand-icon"><i class="bi bi-cpu-fill"></i></div>
-      <div>
-        <div class="adm-brand-title">JKB Admin</div>
-        <div class="adm-brand-sub">Kontrol Merkezi</div>
-      </div>
-    </div>
-    <nav class="adm-nav">
-      <a href="/yonetici/" class="adm-nav-item active"><i class="bi bi-grid-3x3-gap-fill"></i> Dashboard</a>
-      <a href="/yonetici/ayarlar" class="adm-nav-item"><i class="bi bi-gear-fill"></i> Uygulama Ayarları</a>
-      <a href="/yonetici/veritabani" class="adm-nav-item" target="_blank"><i class="bi bi-database-fill"></i> Ham Veritabanı</a>
-    </nav>
-    <div class="adm-sidebar-footer">
-      <div class="small text-secondary mb-1">Giriş: {{ giris_zamani[:16] if giris_zamani != '—' else '—' }}</div>
-      <a href="/yonetici/cikis" class="adm-logout-btn"><i class="bi bi-box-arrow-right"></i> Çıkış</a>
-    </div>
-  </aside>
+  {% set active_page = 'dashboard' %}
+  {% include "admin_sidebar.html" %}
 
   <main class="adm-main">
     <div class="adm-topbar">

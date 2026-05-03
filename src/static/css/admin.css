@@ -480,6 +480,39 @@
   color: var(--adm-muted);
 }
 
+.adm-badge-danger {
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+}
+
+.adm-badge-warning {
+  background: rgba(245,158,11,0.12);
+  color: #fde68a;
+}
+
+/* ── Drag-and-Drop ─────────────────────────────────────── */
+.drag-card-handle {
+  color: #94a3b8;
+  cursor: grab;
+  font-size: 20px;
+  padding: 0 4px;
+  transition: color .15s;
+}
+.drag-card-handle:hover { color: #a5b4fc; }
+
+.sortable-ghost .drag-item-inner {
+  opacity: 0.35;
+}
+
+/* ── Color swatch ──────────────────────────────────────── */
+.color-swatch {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 /* ── Toggle Switch ─────────────────────────────────────── */
 .adm-toggle-row {
   display: flex;

@@ -8,14 +8,13 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="JKB" />
+  <meta name="apple-mobile-web-app-title" content="{{ site_konfig.goruntum.get('site_basligi', 'JKB') if site_konfig else 'JKB' }}" />
 
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}" />
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
   <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png" sizes="512x512" />
 
-  <!-- Google Fonts: Pacifico (imza için) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
@@ -24,7 +23,19 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
-  <title>{% block title %}JKB{% endblock %} — JKB</title>
+  {% set g = site_konfig.goruntum if site_konfig else {} %}
+  {% if g %}
+  <style>
+    :root {
+      {% if g.get('birincil_renk') %}--jkb-primary: {{ g.birincil_renk }};{% endif %}
+    }
+    {% if g.get('navbar_arka') %}
+    .jkb-navbar { background: {{ g.navbar_arka }} !important; }
+    {% endif %}
+  </style>
+  {% endif %}
+
+  <title>{% block title %}{{ g.get('site_basligi','JKB') if g else 'JKB' }}{% endblock %} — {{ g.get('site_basligi','JKB') if g else 'JKB' }}</title>
 </head>
 <body>
 
@@ -32,22 +43,47 @@
   <nav class="navbar navbar-expand-lg navbar-dark jkb-navbar fixed-top">
     <div class="container-fluid px-3">
 
-      <a class="navbar-brand d-flex align-items-center gap-2" href="{% if session.get('kullanici') %}/panel{% else %}/{% endif %}" aria-label="{% if session.get('kullanici') %}Panele dön{% else %}İlk sayfaya dön{% endif %}">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="JKB" height="32" />
+      <a class="navbar-brand d-flex align-items-center gap-2"
+         href="{% if session.get('kullanici') %}/panel{% else %}/{% endif %}"
+         aria-label="Ana sayfaya dön">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="{{ g.get('site_basligi','JKB') if g else 'JKB' }}" height="32" />
       </a>
 
-      <div class="d-flex align-items-center gap-2 ms-auto">
-        {% if session.get('kullanici') %}
-          <a class="nav-link nav-pill {% if request.endpoint == 'panel.ana_panel' %}active{% endif %}" href="/panel"><i class="bi bi-house-door"></i> Ana Sayfa</a>
-          <a class="nav-link nav-pill {% if request.endpoint == 'fitness.fitness_sayfasi' %}active{% endif %}" href="/fitness"><i class="bi bi-activity"></i> Fitness</a>
-          <a class="nav-link nav-pill {% if request.endpoint == 'gorevler.gorev_sayfasi' %}active{% endif %}" href="/gorevler"><i class="bi bi-check2-square"></i> Görevler</a>
-          <a class="nav-link nav-pill {% if request.endpoint == 'notlar.not_sayfasi' %}active{% endif %}" href="/notlar"><i class="bi bi-journal-text"></i> Notlar</a>
-          <a class="nav-link nav-pill nav-pill-accent {% if request.endpoint == 'panel.profil' %}active{% endif %}" href="/profil"><i class="bi bi-person-circle"></i> {{ session.get('kullanici') }}</a>
-          <a class="nav-link nav-pill nav-pill-danger" href="/cikis"><i class="bi bi-box-arrow-right"></i> Çıkış</a>
+      <div class="d-flex align-items-center gap-2 ms-auto flex-wrap">
+        {% set kullanici_giris = session.get('kullanici') %}
+        {% set nav_links = site_konfig.navbar_linkleri if site_konfig else [] %}
+
+        {% if kullanici_giris %}
+          {# Giriş yapılmış kullanıcı linkleri — sadece_giris=True ve aktif olanlar #}
+          {% set giris_linkleri = nav_links | selectattr('sadece_giris') | selectattr('aktif') | list %}
+          {% for link in giris_linkleri | sort(attribute='siralama') %}
+            {% set uc = link.get('stil','') %}
+            {% set cls = 'nav-pill-accent' if uc=='accent' else ('nav-pill-danger' if uc=='danger' else ('nav-pill-primary' if uc=='primary' else ('nav-pill-secondary' if uc=='secondary' else ''))) %}
+            {% if link.id == 'profil' %}
+              <a class="nav-link nav-pill {{ cls }} {% if request.path == link.href %}active{% endif %}"
+                 href="{{ link.href }}">
+                <i class="bi {{ link.icon }}"></i> {{ session.get('kullanici') }}
+              </a>
+            {% else %}
+              <a class="nav-link nav-pill {{ cls }} {% if request.path == link.href %}active{% endif %}"
+                 href="{{ link.href }}">
+                <i class="bi {{ link.icon }}"></i> {{ link.label }}
+              </a>
+            {% endif %}
+          {% endfor %}
         {% else %}
-          <a class="nav-link nav-pill nav-pill-primary {% if request.endpoint == 'auth.giris' %}active{% endif %}" href="/giris"><i class="bi bi-box-arrow-in-right"></i> Giriş Yap</a>
-          <a class="nav-link nav-pill nav-pill-secondary {% if request.endpoint == 'auth.kayit' %}active{% endif %}" href="/kayit"><i class="bi bi-person-plus"></i> Kayıt Ol</a>
+          {# Misafir linkleri — sadece_cikis=True ve aktif olanlar #}
+          {% set cikis_linkleri = nav_links | selectattr('sadece_cikis') | selectattr('aktif') | list %}
+          {% for link in cikis_linkleri | sort(attribute='siralama') %}
+            {% set uc = link.get('stil','') %}
+            {% set cls = 'nav-pill-primary' if uc=='primary' else ('nav-pill-secondary' if uc=='secondary' else ('nav-pill-accent' if uc=='accent' else ('nav-pill-danger' if uc=='danger' else ''))) %}
+            <a class="nav-link nav-pill {{ cls }} {% if request.path == link.href %}active{% endif %}"
+               href="{{ link.href }}">
+              <i class="bi {{ link.icon }}"></i> {{ link.label }}
+            </a>
+          {% endfor %}
         {% endif %}
+
         <button class="btn btn-link nav-link p-1 ms-1" id="temaToggle" onclick="temaToggle()" title="Tema Değiştir">
           <i class="bi bi-sun" id="temaIkon" style="font-size:18px"></i>
         </button>
@@ -71,14 +107,16 @@
 
   <main>{% block content %}{% endblock %}</main>
 
-  <div class="picak-imza">Made By Picak</div>
+  {% set goruntum = site_konfig.goruntum if site_konfig else {} %}
+  {% if goruntum.get('imza_goster', True) %}
+  <div class="picak-imza">{{ goruntum.get('imza_metin', 'Made By Picak') }}</div>
+  {% endif %}
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   <script>
-    // ── Tema Yönetimi ────────────────────────────────────────────
     function temaToggle() {
       const light = document.body.classList.toggle('light-mode');
       localStorage.setItem('jkb_tema', light ? 'light' : 'dark');
@@ -97,7 +135,6 @@
       }
     })();
 
-    // ── PWA Service Worker ───────────────────────────────────────
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/static/sw.js').catch(() => {});
     }

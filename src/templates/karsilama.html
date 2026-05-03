@@ -2,20 +2,21 @@
 {% block title %}Hoş Geldiniz{% endblock %}
 
 {% block content %}
+{% set g = site_konfig.goruntum if site_konfig else {} %}
 <div class="jkb-hero d-flex flex-column align-items-center text-center px-3 pt-hero pb-hero">
 
   <img src="{{ url_for('static', filename='logo.png') }}" alt="JKB Logo"
        class="jkb-hero-logo mb-4 hero-logo-float" />
 
   <div class="hero-copy-wrap">
-    <div class="hero-pill mb-3">Kişisel yönetim • fitness • odak</div>
+    <div class="hero-pill mb-3">{{ g.get('karsilama_pill', 'Kişisel yönetim • fitness • odak') }}</div>
     <h1 class="hero-brand-title fw-black mb-3" style="font-size:clamp(30px,7vw,58px);line-height:1.04">
-      <span class="text-gradient">Daha düzenli.</span><br>
-      Daha güçlü.
+      <span class="text-gradient">{{ g.get('karsilama_baslik_1', 'Daha düzenli.') }}</span><br>
+      {{ g.get('karsilama_baslik_2', 'Daha güçlü.') }}
     </h1>
     <p class="hero-copy mb-0">
-      JKB; gününü, bedenini ve hedeflerini tek bir sade akışta toplar.
-      <span class="hero-copy-accent">Başlamak için doğru yerdesiniz.</span>
+      {{ g.get('karsilama_metin', 'JKB; gününü, bedenini ve hedeflerini tek bir sade akışta toplar.') }}
+      <span class="hero-copy-accent">{{ g.get('karsilama_alt', 'Başlamak için doğru yerdesiniz.') }}</span>
     </p>
   </div>
 
@@ -28,6 +29,6 @@
     </a>
   </div>
 
-  <p class="text-muted mt-4 small hero-footnote">Güvenli · Ücretsiz · Kişisel</p>
+  <p class="text-muted mt-4 small hero-footnote">{{ g.get('karsilama_dipnot', 'Güvenli · Ücretsiz · Kişisel') }}</p>
 </div>
 {% endblock %}

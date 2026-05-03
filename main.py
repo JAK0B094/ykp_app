@@ -1,5 +1,6 @@
 import sys
 import os
+import copy
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -9,7 +10,7 @@ from src.routes.panel import panel
 from src.routes.fitness import fitness
 from src.routes.gorevler import gorevler
 from src.routes.notlar import notlar
-from src.routes.admin import admin_bp
+from src.routes.admin import admin_bp, get_site_konfig
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.secret_key = os.environ.get("SECRET_KEY", "jkb-gizli-anahtar-2026")
@@ -22,10 +23,19 @@ app.register_blueprint(notlar)
 app.register_blueprint(admin_bp)
 
 
+@app.context_processor
+def inject_site_konfig():
+    """Tüm şablonlara site_konfig'i enjekte et."""
+    try:
+        konfig = get_site_konfig()
+        return {"site_konfig": konfig}
+    except Exception:
+        return {"site_konfig": {"navbar_linkleri": [], "goruntum": {}, "sayfalar": []}}
+
+
 @app.before_request
 def bakim_modu_kontrol():
     """Bakım modunda yönetici dışındaki tüm istekleri engelle."""
-    # Admin rotalarına ve statik dosyalara her zaman izin ver
     if request.path.startswith("/yonetici") or request.path.startswith("/static"):
         return
     try:
