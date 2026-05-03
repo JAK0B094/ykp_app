@@ -230,6 +230,47 @@ def api_hatirlaticilar():
     return jsonify(db.hatirlatici_getir(kullanici))
 
 
+@fitness.route("/api/fitness/hatirlatici", methods=["POST"])
+@giris_gerekli
+def api_hatirlatici_ekle():
+    import uuid
+    kullanici = session["kullanici"]
+    data = request.get_json(silent=True) or {}
+    yeni = {
+        "id": str(uuid.uuid4())[:8],
+        "tur": data.get("tur", "genel"),
+        "saat": data.get("saat", "09:00"),
+        "mesaj": data.get("mesaj", ""),
+        "aktif": True,
+    }
+    mevcut = db.hatirlatici_getir(kullanici)
+    mevcut.append(yeni)
+    db.hatirlatici_kaydet(kullanici, mevcut)
+    return jsonify({"basari": True, "hatirlaticilar": mevcut})
+
+
+@fitness.route("/api/fitness/hatirlatici/<hat_id>", methods=["DELETE"])
+@giris_gerekli
+def api_hatirlatici_sil(hat_id):
+    kullanici = session["kullanici"]
+    mevcut = [h for h in db.hatirlatici_getir(kullanici) if h.get("id") != hat_id]
+    db.hatirlatici_kaydet(kullanici, mevcut)
+    return jsonify({"basari": True, "hatirlaticilar": mevcut})
+
+
+@fitness.route("/api/fitness/hatirlatici/<hat_id>/toggle", methods=["POST"])
+@giris_gerekli
+def api_hatirlatici_toggle(hat_id):
+    kullanici = session["kullanici"]
+    liste = db.hatirlatici_getir(kullanici)
+    for h in liste:
+        if h.get("id") == hat_id:
+            h["aktif"] = not h.get("aktif", True)
+            break
+    db.hatirlatici_kaydet(kullanici, liste)
+    return jsonify({"basari": True, "hatirlaticilar": liste})
+
+
 @fitness.route("/api/fitness/motivasyon")
 @giris_gerekli
 def api_motivasyon():

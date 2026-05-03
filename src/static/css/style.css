@@ -397,7 +397,7 @@ body.light-mode .jkb-navbar .nav-link.active {
 /* Makro Progress Barlar */
 .macro-bar-label { font-size: 11px; }
 
-/* Egzersiz Kartları */
+/* Egzersiz Kartları — Eski Format */
 .egzersiz-karti {
   background: var(--jkb-card);
   border: 1px solid rgba(255,255,255,0.07);
@@ -418,6 +418,126 @@ body.light-mode .jkb-navbar .nav-link.active {
 }
 .egzersiz-resim { width:100%; height:160px; object-fit:cover; display:none; }
 .egzersiz-placeholder { align-items:center; justify-content:center; width:100%; height:100%; }
+
+/* ── Split Egzersiz Kartları (GIF'li) ─────────────────────────────────── */
+.egzersiz-split-karti {
+  background: var(--jkb-card);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+  cursor: pointer;
+  position: relative;
+}
+.egzersiz-split-karti:hover {
+  border-color: rgba(233,69,96,0.35);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.egzersiz-split-karti .eg-gif-alan {
+  width: 100%;
+  height: 140px;
+  background: #0a0a14;
+  overflow: hidden;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.egzersiz-split-karti .eg-gif-img {
+  width: 100%; height: 140px;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+.egzersiz-split-karti:hover .eg-gif-img {
+  transform: scale(1.04);
+}
+.egzersiz-split-karti .eg-gif-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 0;
+}
+.egzersiz-split-karti .eg-kas-ikon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.06);
+  font-size: 14px;
+}
+.egzersiz-split-karti .eg-bilgi { padding: 10px 12px 12px; }
+.egzersiz-split-karti .eg-isim {
+  font-size: 12px; font-weight: 600;
+  color: #e0e0e0;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.egzersiz-split-karti .eg-cb-overlay {
+  position: absolute; top: 8px; right: 8px;
+  z-index: 2;
+}
+.egzersiz-split-karti .eg-cb-overlay input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: #27ae60;
+  cursor: pointer;
+}
+.egzersiz-split-karti.tamamlandi {
+  border-color: rgba(39,174,96,0.5);
+  opacity: 0.75;
+}
+.egzersiz-split-karti.tamamlandi .eg-gif-img {
+  filter: saturate(0.4) brightness(0.7);
+}
+
+/* ── Egzersiz Ansiklopedisi Kartları ─────────────────────────────────── */
+.ans-karti {
+  background: var(--jkb-card);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+  cursor: pointer;
+  height: 100%;
+}
+.ans-karti:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.15);
+}
+.ans-karti .ans-gif-alan {
+  height: 120px;
+  background: #0a0a14;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.ans-karti .ans-gif-img {
+  width: 100%; height: 120px;
+  object-fit: cover;
+}
+.ans-karti .ans-bilgi { padding: 10px 12px 12px; }
+.ans-karti .ans-isim {
+  font-size: 12px; font-weight: 600;
+  color: #e0e0e0; margin-bottom: 5px;
+  line-height: 1.3;
+}
+.ans-karti .ans-kategori-bar {
+  height: 3px; width: 100%;
+}
+.ans-filtre-btn {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: var(--jkb-muted);
+  cursor: pointer;
+  transition: all .15s;
+}
+.ans-filtre-btn.active, .ans-filtre-btn:hover {
+  background: rgba(233,69,96,0.15);
+  border-color: rgba(233,69,96,0.4);
+  color: #fff;
+}
 
 /* Set Takip Alanları */
 .set-tracking input { font-size: 12px; }

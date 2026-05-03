@@ -19,7 +19,9 @@
                 "aktivite": "Orta Aktif (3-5 gün/hafta)",
                 "hedef": "Kas Yap",
                 "seviye": "Başlangıç",
-                "baslangic_tarihi": ""
+                "baslangic_tarihi": "",
+                "ekipman": "Spor Salonu (Tam Ekipman)",
+                "gun_sayisi": "3 Gün/Hafta"
             },
             "fitness_gecmisi": [
                 {
@@ -27,6 +29,13 @@
                     "kilo": 82.0,
                     "vki": 25.3,
                     "hedef_kalori": 3106
+                },
+                {
+                    "tarih": "2026-05-03",
+                    "kilo": 82.0,
+                    "vki": 25.3,
+                    "hedef_kalori": 3056,
+                    "bf_yuzde": 20.6
                 }
             ],
             "su_kayitlari": {
@@ -50,7 +59,11 @@
                 }
             ],
             "telefon": "5358520918",
-            "notlar": "Spaşai"
+            "notlar": "Spaşai",
+            "rol": "admin",
+            "admin_token": "e6RPITZ0Q4VY69Ym",
+            "durum": "aktif",
+            "kilitli": false
         }
     }
 }

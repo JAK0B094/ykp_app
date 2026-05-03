@@ -5,7 +5,10 @@ Flask tabanlı PWA (Progressive Web App). Mobil öncelikli tasarım, Bootstrap 5
 
 ## Özellikler
 - Kullanıcı kaydı, girişi, şifre sıfırlama (OTP e-posta akışı)
-- **Fitness Koçu:** VKİ hesaplama, antrenman programı, geçmiş, su takibi, hatırlatıcılar, motivasyon
+- **Fitness Koçu:** VKİ, BMR, TDEE, FFMI, vücut kompozisyonu, 5 uzman program tipi (yakma/hipertrofi/kuvvet/powerbuilding/kardiyo), periodizasyon, deload haftası, su takibi, hatırlatıcılar, motivasyon
+- **Kas Anatomisi Ansiklopedisi:** 14 kas grubu — alt kaslar, köken/yapışma, fonksiyon, lif tipi, en etkili egzersizler, sık hatalar, prehab önerileri
+- **Egzersiz Ansiklopedisi:** 70+ egzersiz — birincil/ikincil kaslar, mekanik, teknik, hatalar, varyasyonlar, GIF görselleri (fitnessprogramer.com)
+- **Egzersiz GIF Kartları:** Split program görünümünde her egzersiz canlı GIF ile gösterilir, tamamlama checkbox'ı var, detay modal açılır
 - **Görevler:** Ekleme, tamamlama, silme, filtreleme
 - **Kişisel Notlar:** Markdown benzeri metin editörü
 - **Profil:** Şifre değiştirme, telefon güncelleme
