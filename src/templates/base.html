@@ -36,63 +36,21 @@
         <img src="{{ url_for('static', filename='logo.png') }}" alt="JKB" height="32" />
       </a>
 
-      <div class="d-flex align-items-center gap-2 d-lg-none">
-        <button class="btn btn-link nav-link p-1" id="temaToggleMobil" onclick="temaToggle()" title="Tema Değiştir">
-          <i class="bi bi-sun" id="temaIkonMobil" style="font-size:18px"></i>
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        {% if session.get('kullanici') %}
+          <a class="nav-link nav-pill {% if request.endpoint == 'panel.ana_panel' %}active{% endif %}" href="/panel"><i class="bi bi-house-door"></i> Ana Sayfa</a>
+          <a class="nav-link nav-pill {% if request.endpoint == 'fitness.fitness_sayfasi' %}active{% endif %}" href="/fitness"><i class="bi bi-activity"></i> Fitness</a>
+          <a class="nav-link nav-pill {% if request.endpoint == 'gorevler.gorev_sayfasi' %}active{% endif %}" href="/gorevler"><i class="bi bi-check2-square"></i> Görevler</a>
+          <a class="nav-link nav-pill {% if request.endpoint == 'notlar.not_sayfasi' %}active{% endif %}" href="/notlar"><i class="bi bi-journal-text"></i> Notlar</a>
+          <a class="nav-link nav-pill {% if request.endpoint == 'panel.profil' %}active{% endif %}" href="/profil"><i class="bi bi-person-circle"></i> {{ session.get('kullanici') }}</a>
+          <a class="nav-link nav-pill text-danger" href="/cikis"><i class="bi bi-box-arrow-right"></i> Çıkış</a>
+        {% else %}
+          <a class="nav-link nav-pill {% if request.endpoint == 'auth.giris' %}active{% endif %}" href="/giris"><i class="bi bi-box-arrow-in-right"></i> Giriş Yap</a>
+          <a class="nav-link nav-pill {% if request.endpoint == 'auth.kayit' %}active{% endif %}" href="/kayit"><i class="bi bi-person-plus"></i> Kayıt Ol</a>
+        {% endif %}
+        <button class="btn btn-link nav-link p-1 ms-1" id="temaToggle" onclick="temaToggle()" title="Tema Değiştir">
+          <i class="bi bi-sun" id="temaIkon" style="font-size:18px"></i>
         </button>
-        <button class="navbar-toggler border-0" type="button"
-                data-bs-toggle="collapse" data-bs-target="#navMenu"
-                aria-controls="navMenu" aria-expanded="false" aria-label="Menüyü aç">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </div>
-
-      <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1 align-items-lg-center">
-          {% if session.get('kullanici') %}
-            <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'panel.ana_panel' %}active{% endif %}"
-                 href="/panel"><i class="bi bi-house-door"></i> Ana Sayfa</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'fitness.fitness_sayfasi' %}active{% endif %}"
-                 href="/fitness"><i class="bi bi-activity"></i> Fitness</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'gorevler.gorev_sayfasi' %}active{% endif %}"
-                 href="/gorevler"><i class="bi bi-check2-square"></i> Görevler</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'notlar.not_sayfasi' %}active{% endif %}"
-                 href="/notlar"><i class="bi bi-journal-text"></i> Notlar</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'panel.profil' %}active{% endif %}"
-                 href="/profil"><i class="bi bi-person-circle"></i> {{ session.get('kullanici') }}</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-danger" href="/cikis">
-                <i class="bi bi-box-arrow-right"></i> Çıkış</a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'auth.giris' %}active{% endif %}"
-                 href="/giris"><i class="bi bi-box-arrow-in-right"></i> Giriş Yap</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link btn btn-sm btn-outline-light px-3 ms-1
-                         {% if request.endpoint == 'auth.kayit' %}active{% endif %}"
-                 href="/kayit"><i class="bi bi-person-plus"></i> Kayıt Ol</a>
-            </li>
-          {% endif %}
-
-          <!-- Masaüstü tema toggle -->
-          <li class="nav-item d-none d-lg-block ms-1">
-            <button class="btn btn-link nav-link px-2" id="temaToggle" onclick="temaToggle()" title="Tema Değiştir">
-              <i class="bi bi-sun" id="temaIkon" style="font-size:18px"></i>
-            </button>
-          </li>
-        </ul>
       </div>
     </div>
   </nav>

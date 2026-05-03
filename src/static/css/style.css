@@ -50,14 +50,14 @@ body.light-mode .hero-copy { color: #1a1a2e; }
 
 /* ── Navbar ──────────────────────────────────────────────── */
 .jkb-navbar {
-  background-color: var(--jkb-surface) !important;
+  background-color: #ff8c00 !important;
   border-bottom: 1px solid rgba(255,255,255,0.07);
   height: var(--jkb-nav-h);
   z-index: 1100;
 }
 
 .jkb-navbar .nav-link {
-  color: var(--jkb-muted) !important;
+  color: #ffffff !important;
   border-radius: 8px;
   padding: 6px 12px !important;
   transition: color .2s, background .2s;
@@ -66,7 +66,11 @@ body.light-mode .hero-copy { color: #1a1a2e; }
 .jkb-navbar .nav-link:hover,
 .jkb-navbar .nav-link.active {
   color: #fff !important;
-  background: rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.12);
+}
+
+.jkb-navbar .navbar-brand img {
+  filter: brightness(0) invert(1);
 }
 
 /* ── Hero (Karşılama) ────────────────────────────────────── */
