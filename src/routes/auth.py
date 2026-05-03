@@ -31,7 +31,7 @@ def _email_gonder(alici, otp):
 
     if not host or not user:
         print(f"[JKB OTP] {alici} → {otp}")
-        return False  # e-posta gönderilmedi
+        return False
 
     try:
         msg = MIMEMultipart("alternative")
@@ -76,10 +76,23 @@ def giris():
         basari, mesaj = db.giris_kontrol(kullanici_adi, sifre)
         if basari:
             session["kullanici"] = kullanici_adi
+            # Sisteme giriş olayını kaydet
+            db.sistem_log_ekle(
+                "Kullanıcı Girişi",
+                f"'{kullanici_adi}' başarıyla giriş yaptı.",
+                seviye="bilgi",
+                kullanici=kullanici_adi,
+            )
             flash(f"Hoş geldin, {kullanici_adi}!", "success")
             return redirect(url_for("panel.ana_panel"))
         else:
             hata = mesaj
+            db.sistem_log_ekle(
+                "Başarısız Giriş",
+                f"'{kullanici_adi}' için giriş başarısız: {mesaj}",
+                seviye="uyari",
+                kullanici=kullanici_adi,
+            )
 
     return render_template("giris.html", hata=hata)
 
@@ -117,6 +130,12 @@ def cikis():
     kullanici = session.pop("kullanici", None)
     session.pop("reset_info", None)
     if kullanici:
+        db.sistem_log_ekle(
+            "Kullanıcı Çıkışı",
+            f"'{kullanici}' çıkış yaptı.",
+            seviye="bilgi",
+            kullanici=kullanici,
+        )
         flash("Başarıyla çıkış yapıldı.", "info")
     return redirect(url_for("karsilama"))
 
@@ -126,20 +145,15 @@ def cikis():
 @auth.route("/sifre-sifirla", methods=["GET", "POST"])
 def sifre_sifirla():
     reset_info = session.get("reset_info", {})
-
-    # GET: adım URL'den gelir
     adim = request.args.get("adim", "1")
     hata = None
 
     if request.method == "POST":
         adim = request.form.get("adim", "1")
 
-        # ── Adım 1: E-posta doğrula & OTP üret ──
         if adim == "1":
             eposta = request.form.get("eposta", "").strip().lower()
             kullanici_adi, _ = _eposta_ile_kullanici_bul(eposta)
-
-            # Güvenlik: her durumda adım 2'ye geç (kullanıcı adı doğrulaması gizle)
             if not kullanici_adi:
                 hata = "Bu e-posta ile kayıtlı hesap bulunamadı."
                 adim = "1"
@@ -149,17 +163,21 @@ def sifre_sifirla():
                     "kullanici": kullanici_adi,
                     "eposta": eposta,
                     "otp": otp,
-                    "son_tarih": time.time() + 900,  # 15 dakika
+                    "son_tarih": time.time() + 900,
                     "denemeler": 0,
                     "otp_dogrulandi": False,
                 }
                 gonderildi = _email_gonder(eposta, otp)
                 if not gonderildi:
-                    # SMTP ayarlı değil: kodu flash ile göster (geliştirme modu)
                     flash(f"[Geliştirme Modu] Doğrulama kodu: {otp}", "warning")
+                db.sistem_log_ekle(
+                    "Şifre Sıfırlama İsteği",
+                    f"'{kullanici_adi}' şifre sıfırlama başlattı.",
+                    seviye="uyari",
+                    kullanici=kullanici_adi,
+                )
                 return redirect(url_for("auth.sifre_sifirla", adim="2"))
 
-        # ── Adım 2: OTP doğrula ──
         elif adim == "2":
             reset_info = session.get("reset_info", {})
             if not reset_info or time.time() > reset_info.get("son_tarih", 0):
@@ -185,7 +203,6 @@ def sifre_sifirla():
                 session["reset_info"] = reset_info
                 return redirect(url_for("auth.sifre_sifirla", adim="3"))
 
-        # ── Adım 3: Yeni şifre ──
         elif adim == "3":
             reset_info = session.get("reset_info", {})
             if not reset_info or not reset_info.get("otp_dogrulandi"):
@@ -202,18 +219,21 @@ def sifre_sifirla():
                 hata = "Şifre 6-32 karakter arasında olmalıdır!"
                 adim = "3"
             else:
-                basari, mesaj = db.eposta_ile_sifre_sifirla(
-                    reset_info["eposta"], yeni
-                )
+                basari, mesaj = db.eposta_ile_sifre_sifirla(reset_info["eposta"], yeni)
                 session.pop("reset_info", None)
                 if basari:
-                    flash("Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz.", "success")
+                    db.sistem_log_ekle(
+                        "Şifre Sıfırlandı",
+                        f"'{reset_info.get('kullanici', '?')}' şifresini sıfırladı.",
+                        seviye="basari",
+                        kullanici=reset_info.get("kullanici", ""),
+                    )
+                    flash("Şifreniz başarıyla güncellendi!", "success")
                     return redirect(url_for("auth.giris"))
                 else:
                     hata = mesaj
                     adim = "3"
 
     return render_template("sifre_sifirla.html",
-                           adim=adim,
-                           hata=hata,
+                           adim=adim, hata=hata,
                            reset_info=session.get("reset_info", {}))

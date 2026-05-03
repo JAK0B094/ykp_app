@@ -4,85 +4,327 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>JKB — Yönetici Paneli</title>
+  <title>JKB — Gösterge Paneli</title>
   <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/admin.css" />
 </head>
 <body class="adm-body">
-  {% set active_page = 'dashboard' %}
   {% include "admin_sidebar.html" %}
 
   <main class="adm-main">
     <div class="adm-topbar">
       <div>
-        <h1 class="adm-page-title">Dashboard</h1>
+        <h1 class="adm-page-title"><i class="bi bi-grid-3x3-gap-fill me-2"></i>Gösterge Paneli</h1>
         <div class="adm-page-sub">Genel bakış ve kullanıcı yönetimi</div>
       </div>
-      <div class="d-flex gap-2 align-items-center"><span class="adm-online-badge"><span class="adm-dot"></span> Aktif</span></div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <span class="adm-online-badge"><span class="adm-dot"></span> Canlı</span>
+        <button onclick="verileriYenile()" class="adm-btn-sm adm-btn-primary" id="yenileBtn">
+          <i class="bi bi-arrow-clockwise"></i> Yenile
+        </button>
+        <span class="small text-secondary" id="sonGuncelleme" style="font-size:11px"></span>
+      </div>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for cat, msg in messages %}
-        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show mx-0 mb-3" role="alert">{{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show mx-0 mb-3" role="alert">
+          {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
-    <div class="adm-stat-grid">
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(99,102,241,0.15);color:#a5b4fc"><i class="bi bi-people-fill"></i></div><div class="adm-stat-val">{{ toplam_kullanici }}</div><div class="adm-stat-lbl">Toplam Kullanıcı</div></div>
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(34,197,94,0.15);color:#86efac"><i class="bi bi-check2-square"></i></div><div class="adm-stat-val">{{ toplam_gorev }}</div><div class="adm-stat-lbl">Toplam Görev <span class="adm-mini-badge">{{ tamamlanan_gorev }} tamamlandı</span></div></div>
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(251,191,36,0.15);color:#fde68a"><i class="bi bi-activity"></i></div><div class="adm-stat-val">{{ toplam_fitness }}</div><div class="adm-stat-lbl">Fitness Kaydı</div></div>
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(239,68,68,0.15);color:#fca5a5"><i class="bi bi-lightning-charge-fill"></i></div><div class="adm-stat-val">{{ toplam_antrenman }}</div><div class="adm-stat-lbl">Toplam Antrenman</div></div>
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(14,165,233,0.15);color:#7dd3fc"><i class="bi bi-droplet-half"></i></div><div class="adm-stat-val">{{ toplam_su }}</div><div class="adm-stat-lbl">Su Kayıt Günü</div></div>
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(168,85,247,0.15);color:#d8b4fe"><i class="bi bi-bell-fill"></i></div><div class="adm-stat-val">{{ toplam_hatirlatici }}</div><div class="adm-stat-lbl">Hatırlatıcı</div></div>
-      <div class="adm-stat-card"><div class="adm-stat-icon" style="background:rgba(14,165,233,0.15);color:#7dd3fc"><i class="bi bi-database"></i></div><div class="adm-stat-val">{{ "%.1f"|format(db_boyutu / 1024) }} KB</div><div class="adm-stat-lbl">Veritabanı Boyutu</div></div>
+    <!-- İstatistik Kartları -->
+    <div class="adm-stat-grid" id="statGrid">
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(99,102,241,0.15);color:#a5b4fc"><i class="bi bi-people-fill"></i></div>
+        <div class="adm-stat-val" id="stat-toplam_kullanici">{{ toplam_kullanici }}</div>
+        <div class="adm-stat-lbl">Toplam Kullanıcı</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(34,197,94,0.15);color:#86efac"><i class="bi bi-check2-square"></i></div>
+        <div class="adm-stat-val" id="stat-toplam_gorev">{{ toplam_gorev }}</div>
+        <div class="adm-stat-lbl">Toplam Görev <span class="adm-mini-badge" id="stat-tamamlanan_gorev">{{ tamamlanan_gorev }} tamamlandı</span></div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(251,191,36,0.15);color:#fde68a"><i class="bi bi-activity"></i></div>
+        <div class="adm-stat-val" id="stat-toplam_fitness">{{ toplam_fitness }}</div>
+        <div class="adm-stat-lbl">Fitness Kaydı</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(239,68,68,0.15);color:#fca5a5"><i class="bi bi-lightning-charge-fill"></i></div>
+        <div class="adm-stat-val" id="stat-toplam_antrenman">{{ toplam_antrenman }}</div>
+        <div class="adm-stat-lbl">Toplam Antrenman</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(14,165,233,0.15);color:#7dd3fc"><i class="bi bi-droplet-half"></i></div>
+        <div class="adm-stat-val" id="stat-toplam_su">{{ toplam_su }}</div>
+        <div class="adm-stat-lbl">Su Kayıt Günü</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(168,85,247,0.15);color:#d8b4fe"><i class="bi bi-bell-fill"></i></div>
+        <div class="adm-stat-val" id="stat-toplam_hatirlatici">{{ toplam_hatirlatici }}</div>
+        <div class="adm-stat-lbl">Hatırlatıcı</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(239,68,68,0.15);color:#fca5a5"><i class="bi bi-lock-fill"></i></div>
+        <div class="adm-stat-val" id="stat-kilitli_sayisi">{{ kilitli_sayisi }}</div>
+        <div class="adm-stat-lbl">Kilitli Hesap</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(14,165,233,0.15);color:#7dd3fc"><i class="bi bi-database"></i></div>
+        <div class="adm-stat-val" id="stat-db_boyutu">{{ "%.1f"|format(db_boyutu / 1024) }} KB</div>
+        <div class="adm-stat-lbl">Veritabanı Boyutu</div>
+      </div>
     </div>
 
+    <!-- Hızlı İşlemler -->
+    <div class="adm-section mb-3">
+      <div class="adm-section-title mb-3"><i class="bi bi-lightning me-2"></i>Hızlı İşlemler</div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="/yonetici/kullanici-olustur" class="adm-btn-action adm-btn-primary">
+          <i class="bi bi-person-plus me-1"></i>Yeni Kullanıcı
+        </a>
+        <form method="POST" action="/yonetici/yedek/olustur" class="d-inline">
+          <button type="submit" class="adm-btn-action adm-btn-primary">
+            <i class="bi bi-cloud-arrow-down me-1"></i>Hızlı Yedek Al
+          </button>
+        </form>
+        <a href="/yonetici/sistem-log" class="adm-btn-action adm-btn-primary">
+          <i class="bi bi-journal-code me-1"></i>Sistem Günlüğü
+        </a>
+        <a href="/yonetici/ayarlar" class="adm-btn-action adm-btn-primary">
+          <i class="bi bi-gear me-1"></i>Ayarlar
+        </a>
+        <a href="/yonetici/veritabani" class="adm-btn-action adm-btn-primary" target="_blank">
+          <i class="bi bi-database me-1"></i>Ham Veri
+        </a>
+        <a href="/yonetici/yedek/canli-indir" class="adm-btn-action adm-btn-primary">
+          <i class="bi bi-download me-1"></i>DB İndir
+        </a>
+      </div>
+    </div>
+
+    <!-- Kullanıcı Tablosu -->
     <div class="adm-section">
       <div class="adm-section-header">
         <div>
           <div class="adm-section-title"><i class="bi bi-people me-2"></i>Kullanıcılar</div>
-          <div class="adm-section-sub">{{ toplam_kullanici }} kayıtlı hesap</div>
+          <div class="adm-section-sub">{{ toplam_kullanici }} kayıtlı hesap — en yeniler üstte</div>
         </div>
-        <input type="text" id="kullaniciAra" class="adm-search" placeholder="Kullanıcı ara..." oninput="kullaniciAra(this.value)">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+          <input type="text" id="kullaniciAraInput" class="adm-search" placeholder="Kullanıcı ara..." oninput="kullaniciAra(this.value)">
+          <select id="rolFiltre" class="adm-input" style="width:130px" onchange="rolFiltrele(this.value)">
+            <option value="">Tüm Roller</option>
+            <option value="user">user</option>
+            <option value="moderator">moderator</option>
+            <option value="admin">admin</option>
+          </select>
+          <select id="durumFiltre" class="adm-input" style="width:130px" onchange="durumFiltrele(this.value)">
+            <option value="">Tüm Durumlar</option>
+            <option value="aktif">Aktif</option>
+            <option value="kilitli">Kilitli</option>
+            <option value="pasif">Pasif</option>
+          </select>
+        </div>
       </div>
-      <div class="table-responsive">
-        <table class="adm-table" id="kullaniciTablosu">
-          <thead><tr><th>Kullanıcı</th><th>Rol</th><th>Durum</th><th>E-posta</th><th>Görev</th><th>Fitness</th><th>Antrenman</th><th>Hedef</th><th>İşlem</th></tr></thead>
-          <tbody>
-            {% for u in kullanici_ozet %}
-            <tr class="kullanici-satir">
-              <td><div class="d-flex align-items-center gap-2"><div class="adm-avatar">{{ u.ad[0].upper() }}</div><span class="fw-semibold">{{ u.ad }}</span>{% if u.token %}<span class="adm-badge-sm">API</span>{% endif %}</div></td>
-              <td><span class="adm-badge-sm">{{ u.rol }}</span></td>
-              <td>{% if u.kilitli %}<span class="adm-badge-status adm-badge-danger">Kilitli</span>{% else %}<span class="adm-badge-status adm-badge-green">{{ u.durum }}</span>{% endif %}</td>
-              <td class="text-secondary small">{{ u.eposta }}</td>
-              <td><span class="adm-badge-sm">{{ u.gorev_sayisi }}</span></td>
-              <td><span class="adm-badge-sm">{{ u.fitness_kayit }}</span></td>
-              <td><span class="adm-badge-sm">{{ u.antrenman }}</span></td>
-              <td class="small text-secondary">{{ u.hedef }}</td>
-              <td class="d-flex gap-1 flex-wrap">
-                <a href="/yonetici/kullanici/{{ u.ad }}" class="adm-btn-sm adm-btn-primary"><i class="bi bi-pencil-square"></i> Yönet</a>
-                <form method="POST" action="/yonetici/kullanici/{{ u.ad }}/sil" onsubmit="return confirm('{{ u.ad }} silinsin mi?')"><button type="submit" class="adm-btn-sm adm-btn-danger"><i class="bi bi-trash3"></i></button></form>
-              </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="9" class="text-center text-secondary py-4">Henüz kullanıcı yok.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+
+      <!-- Toplu İşlem Formu -->
+      <form method="POST" action="/yonetici/toplu-islem" id="topluForm">
+        <div class="d-flex gap-2 mb-2 align-items-center flex-wrap">
+          <button type="button" onclick="tumunuSec()" class="adm-btn-sm adm-btn-primary">
+            <i class="bi bi-check-all"></i> Tümünü Seç
+          </button>
+          <button type="button" onclick="secimiBozYalnizca('secili_kullanicilar')" class="adm-btn-sm adm-btn-primary">
+            <i class="bi bi-x"></i> Seçimi Kaldır
+          </button>
+          <select name="islem" class="adm-input" style="width:160px" required>
+            <option value="">— Toplu İşlem —</option>
+            <option value="kilitle">Kilitle</option>
+            <option value="aktif_et">Aktif Et</option>
+            <option value="sil">Sil (kalıcı)</option>
+          </select>
+          <button type="submit" class="adm-btn-sm adm-btn-danger"
+                  onclick="return confirm('Seçili kullanıcılara toplu işlem uygulanacak. Emin misiniz?')">
+            <i class="bi bi-play-fill"></i> Uygula
+          </button>
+          <span class="small text-secondary" id="secimSayac">0 seçili</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="adm-table" id="kullaniciTablosu">
+            <thead>
+              <tr>
+                <th style="width:32px"><input type="checkbox" id="hepsiniSec" onchange="hepsiniSecToggle(this)"></th>
+                <th>Kullanıcı</th>
+                <th>Rol</th>
+                <th>Durum</th>
+                <th>E-posta</th>
+                <th>Kayıt Tarihi</th>
+                <th>Son Giriş</th>
+                <th>Görev</th>
+                <th>Fitness</th>
+                <th>Antrenman</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in kullanici_ozet %}
+              <tr class="kullanici-satir"
+                  data-rol="{{ u.rol }}"
+                  data-durum="{{ 'kilitli' if u.kilitli else u.durum }}">
+                <td>
+                  <input type="checkbox" name="secili_kullanicilar" value="{{ u.ad }}"
+                         class="kullanici-checkbox" onchange="secimGuncelle()">
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="adm-avatar">{{ u.ad[0].upper() }}</div>
+                    <div>
+                      <div class="fw-semibold">{{ u.ad }}</div>
+                      {% if u.admin_pinli %}<span class="adm-mini-badge" style="background:rgba(251,191,36,0.2);color:#fde68a"><i class="bi bi-pin-fill"></i> Sabit</span>{% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="adm-badge-sm {% if u.rol == 'admin' %}adm-badge-green{% elif u.rol == 'moderator' %}adm-badge-status{% endif %}">{{ u.rol }}</span>
+                </td>
+                <td>
+                  {% if u.kilitli %}
+                    <span class="adm-badge-status adm-badge-danger"><i class="bi bi-lock-fill"></i> Kilitli</span>
+                  {% elif u.durum == 'pasif' %}
+                    <span class="adm-badge-status adm-badge-gray"><i class="bi bi-pause-fill"></i> Pasif</span>
+                  {% else %}
+                    <span class="adm-badge-status adm-badge-green"><i class="bi bi-circle-fill" style="font-size:7px"></i> Aktif</span>
+                  {% endif %}
+                </td>
+                <td class="text-secondary small">{{ u.eposta }}</td>
+                <td class="small" style="white-space:nowrap;color:#94a3b8">
+                  {% if u.kayit_tarihi and u.kayit_tarihi != '—' %}
+                    <i class="bi bi-calendar3 me-1"></i>{{ u.kayit_tarihi[:10] }}
+                  {% else %}
+                    <span class="text-secondary">—</span>
+                  {% endif %}
+                </td>
+                <td class="small" style="white-space:nowrap;color:#94a3b8">
+                  {% if u.son_giris and u.son_giris != '—' and u.son_giris %}
+                    <i class="bi bi-clock me-1"></i>{{ u.son_giris[:16] }}
+                  {% else %}
+                    <span class="text-secondary">Hiç</span>
+                  {% endif %}
+                </td>
+                <td><span class="adm-badge-sm">{{ u.gorev_sayisi }}</span></td>
+                <td><span class="adm-badge-sm">{{ u.fitness_kayit }}</span></td>
+                <td><span class="adm-badge-sm">{{ u.antrenman }}</span></td>
+                <td>
+                  <div class="d-flex gap-1 flex-wrap">
+                    <a href="/yonetici/kullanici/{{ u.ad }}" class="adm-btn-sm adm-btn-primary">
+                      <i class="bi bi-pencil-square"></i> Yönet
+                    </a>
+                    <form method="POST" action="/yonetici/kullanici/{{ u.ad }}/sil"
+                          onsubmit="return confirm('{{ u.ad }} kalıcı silinsin mi? Bu işlem geri alınamaz!')">
+                      <button type="submit" class="adm-btn-sm adm-btn-danger" title="Sil">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="11" class="text-center text-secondary py-4">Henüz hiç kullanıcı yok.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </form>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    function kullaniciAra(q) {
-      const rows = document.querySelectorAll('#kullaniciTablosu .kullanici-satir');
-      rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none');
+    // ── Arama & Filtreler ──────────────────────────────────────────────────────
+    let aramaMetni = "";
+    let seciliRol  = "";
+    let seciliDurum = "";
+
+    function satirlarıFiltrele() {
+      const satirlar = document.querySelectorAll('#kullaniciTablosu .kullanici-satir');
+      satirlar.forEach(r => {
+        const metin  = r.textContent.toLowerCase();
+        const rol    = r.dataset.rol || "";
+        const durum  = r.dataset.durum || "";
+        const aramaOk = !aramaMetni || metin.includes(aramaMetni);
+        const rolOk   = !seciliRol  || rol === seciliRol;
+        const durumOk = !seciliDurum || durum === seciliDurum;
+        r.style.display = (aramaOk && rolOk && durumOk) ? "" : "none";
+      });
     }
+
+    function kullaniciAra(q) { aramaMetni = q.toLowerCase(); satirlarıFiltrele(); }
+    function rolFiltrele(v)  { seciliRol  = v; satirlarıFiltrele(); }
+    function durumFiltrele(v){ seciliDurum = v; satirlarıFiltrele(); }
+
+    // ── Toplu Seçim ───────────────────────────────────────────────────────────
+    function hepsiniSecToggle(cb) {
+      document.querySelectorAll('.kullanici-checkbox').forEach(c => { c.checked = cb.checked; });
+      secimGuncelle();
+    }
+
+    function tumunuSec() {
+      document.querySelectorAll('.kullanici-checkbox').forEach(c => { c.checked = true; });
+      document.getElementById('hepsiniSec').checked = true;
+      secimGuncelle();
+    }
+
+    function secimiBozYalnizca() {
+      document.querySelectorAll('.kullanici-checkbox').forEach(c => { c.checked = false; });
+      document.getElementById('hepsiniSec').checked = false;
+      secimGuncelle();
+    }
+
+    function secimGuncelle() {
+      const sayac = document.querySelectorAll('.kullanici-checkbox:checked').length;
+      document.getElementById('secimSayac').textContent = sayac + " seçili";
+    }
+
+    // ── Canlı Veri Yenileme ───────────────────────────────────────────────────
+    function verileriYenile() {
+      const btn = document.getElementById('yenileBtn');
+      btn.innerHTML = '<i class="bi bi-arrow-clockwise adm-spin"></i> Yükleniyor...';
+      btn.disabled = true;
+      fetch('/yonetici/api/istatistik')
+        .then(r => r.json())
+        .then(d => {
+          const alanlar = ['toplam_kullanici','toplam_gorev','toplam_fitness',
+                           'toplam_antrenman','toplam_su','toplam_hatirlatici','kilitli_sayisi'];
+          alanlar.forEach(alan => {
+            const el = document.getElementById('stat-' + alan);
+            if (el) el.textContent = d[alan] ?? el.textContent;
+          });
+          const tg = document.getElementById('stat-tamamlanan_gorev');
+          if (tg) tg.textContent = (d.tamamlanan_gorev ?? '?') + ' tamamlandı';
+          const db = document.getElementById('stat-db_boyutu');
+          if (db) db.textContent = (d.db_boyutu_kb ?? '?') + ' KB';
+          document.getElementById('sonGuncelleme').textContent = 'Son: ' + (d.zaman || '');
+          btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Yenile';
+          btn.disabled = false;
+        })
+        .catch(() => {
+          btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Yenile';
+          btn.disabled = false;
+        });
+    }
+
+    // Otomatik yenileme — her 60 saniyede
+    setInterval(verileriYenile, 60000);
+
+    // Sayfa yüklenince son güncelleme zamanını yaz
+    document.getElementById('sonGuncelleme').textContent =
+      'Son: ' + new Date().toLocaleTimeString('tr-TR');
   </script>
 </body>
 </html>

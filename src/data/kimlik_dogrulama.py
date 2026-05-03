@@ -4,9 +4,11 @@ import threading
 import tempfile
 import shutil
 import time
+import datetime
 
 # Uygulama genelinde tek bir kilit — çoklu kullanıcı/thread güvenliği
 _dosya_kilidi = threading.Lock()
+
 
 class KimlikDogrulama:
     def __init__(self, dosya_yolu="src/data/veritabani.json"):
@@ -20,27 +22,25 @@ class KimlikDogrulama:
             if klasor and not os.path.exists(klasor):
                 os.makedirs(klasor, exist_ok=True)
             if not os.path.exists(self.dosya_yolu):
-                self._guvensiz_yaz({"kullanicilar": {}})
+                self._guvensiz_yaz({"kullanicilar": {}, "sistem_log": []})
             else:
-                # Dosya bozuk mu kontrol et
                 with open(self.dosya_yolu, "r", encoding="utf-8") as f:
                     json.load(f)
         except (json.JSONDecodeError, Exception):
-            # Bozuk dosyayı yedekle, temizden başla
             yedek = self.dosya_yolu + ".bak"
             try:
                 shutil.copy2(self.dosya_yolu, yedek)
             except Exception:
                 pass
-            self._guvensiz_yaz({"kullanicilar": {}})
+            self._guvensiz_yaz({"kullanicilar": {}, "sistem_log": []})
 
     def _guvensiz_yaz(self, data):
-        """Kilitsiz yazma — sadece iç kullanım."""
+        """Kilitsiz yazma — sadece iç kullanım. Atomik (tmp→rename)."""
         klasor = os.path.dirname(self.dosya_yolu)
         try:
             fd, tmp_yol = tempfile.mkstemp(dir=klasor or ".", suffix=".tmp")
             with os.fdopen(fd, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+                json.dump(data, f, indent=2, ensure_ascii=False)
             shutil.move(tmp_yol, self.dosya_yolu)
         except Exception:
             try:
@@ -52,23 +52,23 @@ class KimlikDogrulama:
     def veri_oku(self):
         """Thread-safe okuma. Hata durumunda boş yapı döner."""
         with _dosya_kilidi:
-            for deneme in range(3):
+            for _ in range(3):
                 try:
                     with open(self.dosya_yolu, "r", encoding="utf-8") as f:
                         data = json.load(f)
                     if not isinstance(data, dict):
-                        return {"kullanicilar": {}}
-                    if "kullanicilar" not in data:
-                        data["kullanicilar"] = {}
+                        return {"kullanicilar": {}, "sistem_log": []}
+                    data.setdefault("kullanicilar", {})
+                    data.setdefault("sistem_log", [])
                     return data
                 except json.JSONDecodeError:
                     time.sleep(0.05)
                 except FileNotFoundError:
-                    self._guvensiz_yaz({"kullanicilar": {}})
-                    return {"kullanicilar": {}}
+                    self._guvensiz_yaz({"kullanicilar": {}, "sistem_log": []})
+                    return {"kullanicilar": {}, "sistem_log": []}
                 except Exception:
                     time.sleep(0.05)
-            return {"kullanicilar": {}}
+            return {"kullanicilar": {}, "sistem_log": []}
 
     def veri_yaz(self, data):
         """Thread-safe atomik yazma. Yarım yazma asla olmaz."""
@@ -79,16 +79,47 @@ class KimlikDogrulama:
                 raise IOError(f"Veritabanına yazılamadı: {e}")
 
     def _kullanici_guncelle(self, kullanici_adi, alan, deger):
-        """Tek bir alanı güncellemek için kısa yol — tam okuma/yazma döngüsü."""
+        """Tek bir alanı güncellemek için kısa yol."""
         with _dosya_kilidi:
             try:
                 with open(self.dosya_yolu, "r", encoding="utf-8") as f:
                     data = json.load(f)
             except Exception:
-                data = {"kullanicilar": {}}
+                data = {"kullanicilar": {}, "sistem_log": []}
             if kullanici_adi in data.get("kullanicilar", {}):
                 data["kullanicilar"][kullanici_adi][alan] = deger
                 self._guvensiz_yaz(data)
+
+    # ── Sistem Günlüğü ────────────────────────────────────────────────────────
+
+    def sistem_log_ekle(self, olay, detay="", seviye="bilgi", kullanici="—"):
+        """Sistem olayını günlüğe ekle. Thread-safe. Son 500 kayıt tutulur."""
+        with _dosya_kilidi:
+            try:
+                with open(self.dosya_yolu, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                data = {"kullanicilar": {}, "sistem_log": []}
+            data.setdefault("sistem_log", [])
+            giris = {
+                "zaman": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "olay": olay,
+                "detay": detay[:300],
+                "seviye": seviye,       # bilgi / uyari / hata / basari
+                "kullanici": kullanici,
+            }
+            data["sistem_log"].append(giris)
+            if len(data["sistem_log"]) > 500:
+                data["sistem_log"] = data["sistem_log"][-500:]
+            self._guvensiz_yaz(data)
+
+    def sistem_log_getir(self, son_n=100):
+        try:
+            data = self.veri_oku()
+            log = data.get("sistem_log", [])
+            return list(reversed(log[-son_n:]))
+        except Exception:
+            return []
 
     # ── Kimlik Doğrulama ──────────────────────────────────────────────────────
 
@@ -97,13 +128,32 @@ class KimlikDogrulama:
             return False, "Kullanıcı adı ve şifre boş olamaz!"
         kullanici_adi = kullanici_adi.strip()
         try:
-            data = self.veri_oku()
-            kullanicilar = data.get("kullanicilar", {})
-            if kullanici_adi in kullanicilar:
-                if str(kullanicilar[kullanici_adi].get("sifre", "")) == str(sifre):
-                    return True, "Giriş başarılı!"
-                return False, "Şifre hatalı!"
-            return False, "Kullanıcı bulunamadı!"
+            with _dosya_kilidi:
+                try:
+                    with open(self.dosya_yolu, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                except Exception:
+                    return False, "Sistem hatası: veritabanı okunamadı."
+                kullanicilar = data.get("kullanicilar", {})
+                if kullanici_adi not in kullanicilar:
+                    return False, "Kullanıcı bulunamadı!"
+                k = kullanicilar[kullanici_adi]
+                # Kilitli kontrolü
+                if k.get("kilitli", False):
+                    return False, "Bu hesap kilitlenmiştir. Yöneticiye başvurun."
+                # Durum kontrolü
+                if k.get("durum", "aktif") == "pasif":
+                    return False, "Bu hesap askıya alınmıştır."
+                # Şifre kontrolü
+                if str(k.get("sifre", "")) != str(sifre):
+                    return False, "Şifre hatalı!"
+                # Başarılı giriş: son_giris ve giris_sayaci güncelle
+                simdiki_zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                kullanicilar[kullanici_adi]["son_giris"] = simdiki_zaman
+                kullanicilar[kullanici_adi]["giris_sayaci"] = k.get("giris_sayaci", 0) + 1
+                data["kullanicilar"] = kullanicilar
+                self._guvensiz_yaz(data)
+                return True, "Giriş başarılı!"
         except Exception as e:
             return False, f"Sistem hatası: {e}"
 
@@ -126,7 +176,7 @@ class KimlikDogrulama:
                     with open(self.dosya_yolu, "r", encoding="utf-8") as f:
                         data = json.load(f)
                 except Exception:
-                    data = {"kullanicilar": {}}
+                    data = {"kullanicilar": {}, "sistem_log": []}
 
                 kullanicilar = data.get("kullanicilar", {})
                 if kullanici_adi in kullanicilar:
@@ -135,15 +185,36 @@ class KimlikDogrulama:
                     if v.get("eposta", "").lower() == eposta:
                         return False, "Bu e-posta adresi zaten kayıtlı!"
 
+                simdiki_zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 kullanicilar[kullanici_adi] = {
                     "sifre": sifre,
                     "eposta": eposta,
+                    "kayit_tarihi": simdiki_zaman,
+                    "son_giris": "",
+                    "giris_sayaci": 0,
+                    "durum": "aktif",
+                    "kilitli": False,
+                    "rol": "user",
                     "fitness_gecmisi": [],
                     "gorevler": [],
                     "notlar": "",
-                    "fitness_profil": {}
+                    "fitness_profil": {},
+                    "antrenman_kayitlari": [],
+                    "su_kayitlari": {},
+                    "hatirlaticilar": [],
                 }
                 data["kullanicilar"] = kullanicilar
+                # Sistem log kaydı da aynı yazımda
+                data.setdefault("sistem_log", [])
+                data["sistem_log"].append({
+                    "zaman": simdiki_zaman,
+                    "olay": "Yeni Kayıt",
+                    "detay": f"'{kullanici_adi}' kayıt oldu — {eposta}",
+                    "seviye": "basari",
+                    "kullanici": kullanici_adi,
+                })
+                if len(data["sistem_log"]) > 500:
+                    data["sistem_log"] = data["sistem_log"][-500:]
                 self._guvensiz_yaz(data)
                 return True, "Kayıt başarılı! Giriş yapabilirsiniz."
         except Exception as e:
@@ -160,6 +231,7 @@ class KimlikDogrulama:
                 for k, v in data["kullanicilar"].items():
                     if v.get("eposta", "").lower() == eposta:
                         data["kullanicilar"][k]["sifre"] = yeni_sifre
+                        data["kullanicilar"][k]["sifre_degisim_tarihi"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         self._guvensiz_yaz(data)
                         return True, "Şifre başarıyla güncellendi!"
             return False, "Bu e-posta ile kayıtlı kullanıcı bulunamadı!"
@@ -174,6 +246,8 @@ class KimlikDogrulama:
             return False, "Yeni şifre 6-32 karakter arasında olmalıdır!"
         try:
             self._kullanici_guncelle(kullanici_adi, "sifre", yeni_sifre)
+            self._kullanici_guncelle(kullanici_adi, "sifre_degisim_tarihi",
+                                     datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             return True, "Şifre başarıyla değiştirildi!"
         except Exception as e:
             return False, f"Hata: {e}"
@@ -200,7 +274,6 @@ class KimlikDogrulama:
             return []
 
     def fitness_profil_kaydet(self, kullanici_adi, profil):
-        """Kullanıcının kalıcı fitness profilini (cinsiyet, baslangic tarihi vb.) sakla."""
         self._kullanici_guncelle(kullanici_adi, "fitness_profil", profil)
 
     def fitness_profil_getir(self, kullanici_adi):

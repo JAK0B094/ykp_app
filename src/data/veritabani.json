@@ -13,13 +13,13 @@
             ],
             "fitness_profil": {
                 "boy": 180.0,
-                "kilo": 82.0,
-                "yas": 28,
+                "kilo": 75.0,
+                "yas": 32,
                 "cinsiyet": "Erkek",
                 "aktivite": "Orta Aktif (3-5 gün/hafta)",
                 "hedef": "Kas Yap",
                 "seviye": "Başlangıç",
-                "baslangic_tarihi": "",
+                "baslangic_tarihi": "2026-05-03",
                 "ekipman": "Spor Salonu (Tam Ekipman)",
                 "gun_sayisi": "3 Gün/Hafta"
             },
@@ -36,6 +36,20 @@
                     "vki": 25.3,
                     "hedef_kalori": 3056,
                     "bf_yuzde": 20.6
+                },
+                {
+                    "tarih": "2026-05-03",
+                    "kilo": 82.0,
+                    "vki": 25.3,
+                    "hedef_kalori": 3056,
+                    "bf_yuzde": 20.6
+                },
+                {
+                    "tarih": "2026-05-03",
+                    "kilo": 75.0,
+                    "vki": 23.1,
+                    "hedef_kalori": 2916,
+                    "bf_yuzde": 18.9
                 }
             ],
             "su_kayitlari": {

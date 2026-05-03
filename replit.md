@@ -15,7 +15,7 @@ Flask tabanlı PWA (Progressive Web App). Mobil öncelikli tasarım, Bootstrap 5
 - **PWA:** Service Worker, manifest, offline destek
 - **Gizli Admin Paneli:** `/yonetici` — tam kontrol merkezi
 
-## Admin Paneli
+## Admin Paneli (Kapsamlı)
 - URL: `/yonetici/giris` (hiçbir yerde linklenmez)
 - Varsayılan şifre: `JKB@admin2026!` (env var `ADMIN_SIFRE` ile değiştirilebilir)
 - Oturum anahtarı: `session["admin_giris"]` — normal kullanıcı oturumundan tamamen bağımsız
@@ -25,22 +25,48 @@ Flask tabanlı PWA (Progressive Web App). Mobil öncelikli tasarım, Bootstrap 5
 ### Admin Rotaları
 | Rota | Açıklama |
 |------|----------|
-| `GET /yonetici/` | Dashboard — istatistikler + kullanıcı tablosu |
-| `GET/POST /yonetici/navbar` | Sürükle-bırak navbar yöneticisi |
+| `GET /yonetici/` | Gösterge Paneli — istatistikler + canlı yenileme + kullanıcı tablosu |
+| `GET /yonetici/api/istatistik` | Canlı JSON istatistik (AJAX, 60s auto-refresh) |
+| `GET/POST /yonetici/kullanici-olustur` | Admin yeni kullanıcı oluşturur |
+| `GET /yonetici/sistem-log` | Sistem olayları günlüğü (kayıt/giriş/admin işlemleri) |
+| `POST /yonetici/sistem-log/temizle` | Günlüğü temizle |
+| `GET /yonetici/yedek` | Yedekleme sayfası |
+| `POST /yonetici/yedek/olustur` | Anlık yedek al (max 10 tutar) |
+| `GET /yonetici/yedek/indir/<dosya>` | Yedek dosyasını indir |
+| `POST /yonetici/yedek/sil/<dosya>` | Yedeği sil |
+| `GET /yonetici/yedek/canli-indir` | Canlı DB'yi doğrudan indir |
+| `GET/POST /yonetici/navbar` | Navbar yöneticisi |
 | `GET/POST /yonetici/goruntum` | Görünüm & tema editörü |
 | `GET/POST /yonetici/ayarlar` | Uygulama ayarları |
+| `POST /yonetici/toplu-islem` | Toplu kullanıcı işlemi (kilitle/aktif et/sil) |
 | `GET /yonetici/kullanici/<ad>` | Kullanıcı detay + yönetim |
 | `POST /yonetici/kullanici/<ad>/sil` | Hesap sil |
 | `POST /yonetici/kullanici/<ad>/sifre-sifirla` | Şifre sıfırla |
 | `POST /yonetici/kullanici/<ad>/eposta-guncelle` | E-posta değiştir |
-| `POST /yonetici/kullanici/<ad>/rol` | Rol değiştir (user/moderator/admin) |
+| `POST /yonetici/kullanici/<ad>/rol` | Rol değiştir |
 | `POST /yonetici/kullanici/<ad>/durum` | Durum değiştir (aktif/pasif/kilitli) |
 | `POST /yonetici/kullanici/<ad>/pin` | Admin'de sabitle/kaldır |
 | `POST /yonetici/kullanici/<ad>/temizle` | Belirli veri alanını temizle |
-| `POST /yonetici/navbar/sifirla` | Navbar'ı varsayılana döndür |
-| `POST /yonetici/goruntum/sifirla` | Görünümü varsayılana döndür |
+| `POST /yonetici/kullanici/<ad>/not-guncelle` | Admin dahili notu kaydet |
 | `GET /yonetici/veritabani` | Ham JSON görüntüle (şifreler gizli) |
-| `GET /yonetici/cikis` | Admin oturumu kapat |
+
+### Kullanıcı Verisi Yapısı (kayit_et güncellemesi)
+Her yeni kullanıcı artık şu alanları içerir:
+- `kayit_tarihi` — ISO formatında kayıt zamanı
+- `son_giris` — Son başarılı giriş zamanı
+- `giris_sayaci` — Toplam giriş sayısı
+- `durum` — aktif / pasif / kilitli
+- `kilitli` — bool (login engeli)
+- `admin_notu` — Admin dahili notu
+
+### Güvenlik Düzeltmeleri
+- `giris_kontrol()` artık `kilitli` ve `durum==pasif` kontrol eder → kilitli kullanıcı giriş yapamaz
+- Tüm giriş/kayıt/çıkış/admin olayları `sistem_log` kaydına düşer
+- Yedek dosyalar `src/data/yedekler/` klasöründe tutulur, max 10 adet
+
+### Sistem Günlüğü
+`veritabani.json` içinde `sistem_log` anahtarı altında, max 500 kayıt tutulur.
+Her kayıt: `zaman`, `olay`, `detay`, `seviye` (bilgi/uyari/hata/basari), `kullanici`
 
 ### Site Konfigürasyonu (`veritabani.json` → `site_konfig`)
 ```json

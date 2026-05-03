@@ -2,33 +2,49 @@
   <div class="adm-sidebar-brand">
     <div class="adm-brand-icon"><i class="bi bi-cpu-fill"></i></div>
     <div>
-      <div class="adm-brand-title">JKB Admin</div>
+      <div class="adm-brand-title">JKB Yönetici</div>
       <div class="adm-brand-sub">Kontrol Merkezi</div>
     </div>
   </div>
+
   <nav class="adm-nav">
-    <a href="/yonetici/" class="adm-nav-item {% if active_page == 'dashboard' %}active{% endif %}">
-      <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+    <div class="adm-nav-group-label">Genel</div>
+    <a href="/yonetici/" class="adm-nav-item {% if active_page == 'panel' %}active{% endif %}">
+      <i class="bi bi-grid-3x3-gap-fill"></i> Gösterge Paneli
     </a>
+    <a href="/yonetici/kullanici-olustur" class="adm-nav-item {% if active_page == 'kullanici_olustur' %}active{% endif %}">
+      <i class="bi bi-person-plus-fill"></i> Kullanıcı Oluştur
+    </a>
+    <a href="/yonetici/sistem-log" class="adm-nav-item {% if active_page == 'log' %}active{% endif %}">
+      <i class="bi bi-journal-code"></i> Sistem Günlüğü
+    </a>
+
+    <div class="adm-nav-group-label mt-2">Görünüm</div>
     <a href="/yonetici/navbar" class="adm-nav-item {% if active_page == 'navbar' %}active{% endif %}">
       <i class="bi bi-list-ul"></i> Navbar Yöneticisi
     </a>
     <a href="/yonetici/goruntum" class="adm-nav-item {% if active_page == 'goruntum' %}active{% endif %}">
-      <i class="bi bi-palette-fill"></i> Görünüm & Tema
+      <i class="bi bi-palette-fill"></i> Görünüm &amp; Tema
     </a>
+
+    <div class="adm-nav-group-label mt-2">Sistem</div>
     <a href="/yonetici/ayarlar" class="adm-nav-item {% if active_page == 'ayarlar' %}active{% endif %}">
       <i class="bi bi-gear-fill"></i> Uygulama Ayarları
     </a>
+    <a href="/yonetici/yedek" class="adm-nav-item {% if active_page == 'yedek' %}active{% endif %}">
+      <i class="bi bi-cloud-arrow-down-fill"></i> Yedekleme
+    </a>
     <a href="/yonetici/veritabani" class="adm-nav-item" target="_blank">
-      <i class="bi bi-database-fill"></i> Ham Veritabanı
+      <i class="bi bi-database-fill"></i> Ham Veri <i class="bi bi-box-arrow-up-right ms-auto small"></i>
     </a>
   </nav>
+
   <div class="adm-sidebar-footer">
     {% if giris_zamani is defined and giris_zamani != '—' %}
-    <div class="small text-secondary mb-1">Giriş: {{ giris_zamani[:16] }}</div>
+    <div class="small text-secondary mb-2" style="font-size:11px"><i class="bi bi-clock me-1"></i>{{ giris_zamani }}</div>
     {% endif %}
     <a href="/yonetici/cikis" class="adm-logout-btn">
-      <i class="bi bi-box-arrow-right"></i> Çıkış
+      <i class="bi bi-box-arrow-right"></i> Çıkış Yap
     </a>
   </div>
 </aside>
