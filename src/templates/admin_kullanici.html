@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="/static/css/admin.css" />
 </head>
 <body class="adm-body">
-
   <aside class="adm-sidebar">
     <div class="adm-sidebar-brand">
       <div class="adm-brand-icon"><i class="bi bi-cpu-fill"></i></div>
@@ -21,32 +20,18 @@
       </div>
     </div>
     <nav class="adm-nav">
-      <a href="/yonetici/" class="adm-nav-item">
-        <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
-      </a>
-      <a href="/yonetici/ayarlar" class="adm-nav-item">
-        <i class="bi bi-gear-fill"></i> Uygulama Ayarları
-      </a>
-      <a href="/yonetici/veritabani" class="adm-nav-item" target="_blank">
-        <i class="bi bi-database-fill"></i> Ham Veritabanı
-      </a>
+      <a href="/yonetici/" class="adm-nav-item"><i class="bi bi-grid-3x3-gap-fill"></i> Dashboard</a>
+      <a href="/yonetici/ayarlar" class="adm-nav-item"><i class="bi bi-gear-fill"></i> Uygulama Ayarları</a>
+      <a href="/yonetici/veritabani" class="adm-nav-item" target="_blank"><i class="bi bi-database-fill"></i> Ham Veritabanı</a>
     </nav>
-    <div class="adm-sidebar-footer">
-      <a href="/yonetici/cikis" class="adm-logout-btn">
-        <i class="bi bi-box-arrow-right"></i> Çıkış
-      </a>
-    </div>
+    <div class="adm-sidebar-footer"><a href="/yonetici/cikis" class="adm-logout-btn"><i class="bi bi-box-arrow-right"></i> Çıkış</a></div>
   </aside>
 
   <main class="adm-main">
-
     <div class="adm-topbar">
       <div>
         <a href="/yonetici/" class="adm-back-link"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
-        <h1 class="adm-page-title mt-1">
-          <div class="adm-avatar adm-avatar-lg me-2">{{ ad[0].upper() }}</div>
-          {{ ad }}
-        </h1>
+        <h1 class="adm-page-title mt-1"><div class="adm-avatar adm-avatar-lg me-2">{{ ad[0].upper() }}</div>{{ ad }}</h1>
         <div class="adm-page-sub">{{ kullanici.get('eposta', '—') }}</div>
       </div>
     </div>
@@ -54,16 +39,12 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for cat, msg in messages %}
-        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show mb-3">
-          {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show mb-3">{{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
     <div class="row g-4">
-
-      <!-- Genel Bilgiler -->
       <div class="col-12 col-lg-4">
         <div class="adm-section h-100">
           <div class="adm-section-title mb-3"><i class="bi bi-person-circle me-2"></i>Genel Bilgiler</div>
@@ -71,76 +52,77 @@
             <dt>Kullanıcı Adı</dt><dd>{{ ad }}</dd>
             <dt>E-posta</dt><dd>{{ kullanici.get('eposta', '—') }}</dd>
             <dt>Telefon</dt><dd>{{ kullanici.get('telefon', '—') }}</dd>
+            <dt>Rol</dt><dd>{{ kullanici.get('rol', 'user') }}</dd>
+            <dt>Durum</dt><dd>{{ kullanici.get('durum', 'aktif') }}</dd>
+            <dt>Kilitli</dt><dd>{{ 'Evet' if kullanici.get('kilitli') else 'Hayır' }}</dd>
             <dt>Görev Sayısı</dt><dd>{{ kullanici.get('gorevler', [])|length }}</dd>
             <dt>Fitness Kaydı</dt><dd>{{ kullanici.get('fitness_gecmisi', [])|length }}</dd>
             <dt>Antrenman</dt><dd>{{ kullanici.get('antrenman_kayitlari', [])|length }}</dd>
+            <dt>Su Günleri</dt><dd>{{ kullanici.get('su_kayitlari', {})|length }}</dd>
+            <dt>Hatırlatıcılar</dt><dd>{{ kullanici.get('hatirlaticilar', [])|length }}</dd>
             <dt>Not Uzunluğu</dt><dd>{{ kullanici.get('notlar', '')|length }} karakter</dd>
           </dl>
-          {% if kullanici.get('fitness_profil') %}
-          <hr class="adm-hr">
-          <div class="adm-section-title mb-2 small"><i class="bi bi-activity me-1"></i>Fitness Profili</div>
-          <dl class="adm-dl">
-            <dt>Boy</dt><dd>{{ kullanici.fitness_profil.get('boy', '—') }} cm</dd>
-            <dt>Kilo</dt><dd>{{ kullanici.fitness_profil.get('kilo', '—') }} kg</dd>
-            <dt>Yaş</dt><dd>{{ kullanici.fitness_profil.get('yas', '—') }}</dd>
-            <dt>Cinsiyet</dt><dd>{{ kullanici.fitness_profil.get('cinsiyet', '—') }}</dd>
-            <dt>Hedef</dt><dd>{{ kullanici.fitness_profil.get('hedef', '—') }}</dd>
-            <dt>Seviye</dt><dd>{{ kullanici.fitness_profil.get('seviye', '—') }}</dd>
-            <dt>Aktivite</dt><dd>{{ kullanici.fitness_profil.get('aktivite', '—') }}</dd>
-          </dl>
-          {% endif %}
         </div>
       </div>
 
-      <!-- İşlemler -->
       <div class="col-12 col-lg-8">
         <div class="row g-3">
+          <div class="col-12">
+            <div class="adm-section">
+              <div class="adm-section-title mb-3"><i class="bi bi-shield-lock me-2"></i>Rol ve Durum Yönetimi</div>
+              <div class="d-flex flex-wrap gap-2">
+                <form method="POST" action="/yonetici/kullanici/{{ ad }}/rol" class="d-flex gap-2 align-items-center">
+                  <select name="rol" class="adm-input" style="width:160px">
+                    <option value="user" {% if kullanici.get('rol', 'user') == 'user' %}selected{% endif %}>user</option>
+                    <option value="moderator" {% if kullanici.get('rol') == 'moderator' %}selected{% endif %}>moderator</option>
+                    <option value="admin" {% if kullanici.get('rol') == 'admin' %}selected{% endif %}>admin</option>
+                  </select>
+                  <button type="submit" class="adm-btn-action adm-btn-primary">Rolü Kaydet</button>
+                </form>
+                <form method="POST" action="/yonetici/kullanici/{{ ad }}/durum" class="d-flex gap-2 align-items-center">
+                  <select name="durum" class="adm-input" style="width:160px">
+                    <option value="aktif" {% if kullanici.get('durum', 'aktif') == 'aktif' %}selected{% endif %}>aktif</option>
+                    <option value="pasif" {% if kullanici.get('durum') == 'pasif' %}selected{% endif %}>pasif</option>
+                    <option value="kilitli" {% if kullanici.get('durum') == 'kilitli' %}selected{% endif %}>kilitli</option>
+                  </select>
+                  <button type="submit" class="adm-btn-action adm-btn-warning">Durumu Kaydet</button>
+                </form>
+                <form method="POST" action="/yonetici/kullanici/{{ ad }}/pin">
+                  <button type="submit" class="adm-btn-action adm-btn-primary">{% if kullanici.get('admin_pinli') %}Sabitlemeyi Kaldır{% else %}Kullanıcıyı Sabitle{% endif %}</button>
+                </form>
+              </div>
+            </div>
+          </div>
 
-          <!-- E-posta Güncelle -->
           <div class="col-12">
             <div class="adm-section">
               <div class="adm-section-title mb-3"><i class="bi bi-envelope me-2"></i>E-posta Güncelle</div>
               <form method="POST" action="/yonetici/kullanici/{{ ad }}/eposta-guncelle" class="d-flex gap-2">
-                <input type="email" name="eposta" class="adm-input flex-fill"
-                       placeholder="Yeni e-posta..." value="{{ kullanici.get('eposta','') }}" required>
+                <input type="email" name="eposta" class="adm-input flex-fill" placeholder="Yeni e-posta..." value="{{ kullanici.get('eposta','') }}" required>
                 <button type="submit" class="adm-btn-action adm-btn-primary">Güncelle</button>
               </form>
             </div>
           </div>
 
-          <!-- Şifre Sıfırla -->
           <div class="col-12">
             <div class="adm-section">
               <div class="adm-section-title mb-3"><i class="bi bi-key me-2"></i>Şifre Sıfırla</div>
               <form method="POST" action="/yonetici/kullanici/{{ ad }}/sifre-sifirla" class="d-flex gap-2">
-                <input type="text" name="yeni_sifre" class="adm-input flex-fill"
-                       placeholder="Yeni şifre (min 6 karakter)" required minlength="6">
+                <input type="text" name="yeni_sifre" class="adm-input flex-fill" placeholder="Yeni şifre (min 6 karakter)" required minlength="6">
                 <button type="submit" class="adm-btn-action adm-btn-warning">Şifreyi Sıfırla</button>
               </form>
             </div>
           </div>
 
-          <!-- Veri Temizle -->
           <div class="col-12">
             <div class="adm-section">
               <div class="adm-section-title mb-3"><i class="bi bi-trash3 me-2"></i>Kullanıcı Verisi Temizle</div>
               <div class="row g-2">
-                {% for alan, etiket, renk in [
-                  ('gorevler', 'Görevler', 'warning'),
-                  ('fitness_gecmisi', 'Fitness Geçmişi', 'warning'),
-                  ('antrenman_kayitlari', 'Antrenmanlar', 'warning'),
-                  ('su_kayitlari', 'Su Kayıtları', 'warning'),
-                  ('hatirlaticilar', 'Hatırlatıcılar', 'warning'),
-                  ('notlar', 'Notlar', 'warning'),
-                  ('fitness_profil', 'Fitness Profili', 'danger'),
-                ] %}
+                {% for alan, etiket, renk in [('gorevler', 'Görevler', 'warning'), ('fitness_gecmisi', 'Fitness Geçmişi', 'warning'), ('antrenman_kayitlari', 'Antrenmanlar', 'warning'), ('su_kayitlari', 'Su Kayıtları', 'warning'), ('hatirlaticilar', 'Hatırlatıcılar', 'warning'), ('notlar', 'Notlar', 'warning'), ('fitness_profil', 'Fitness Profili', 'danger')] %}
                 <div class="col-auto">
-                  <form method="POST" action="/yonetici/kullanici/{{ ad }}/temizle"
-                        onsubmit="return confirm('{{ etiket }} verisi silinecek. Emin misiniz?')">
+                  <form method="POST" action="/yonetici/kullanici/{{ ad }}/temizle" onsubmit="return confirm('{{ etiket }} verisi silinecek. Emin misiniz?')">
                     <input type="hidden" name="alan" value="{{ alan }}">
-                    <button type="submit" class="adm-btn-sm adm-btn-{{ renk }}">
-                      <i class="bi bi-x-circle me-1"></i>{{ etiket }}
-                    </button>
+                    <button type="submit" class="adm-btn-sm adm-btn-{{ renk }}"><i class="bi bi-x-circle me-1"></i>{{ etiket }}</button>
                   </form>
                 </div>
                 {% endfor %}
@@ -148,25 +130,17 @@
             </div>
           </div>
 
-          <!-- Hesap Sil -->
           <div class="col-12">
             <div class="adm-section adm-danger-zone">
               <div class="adm-section-title mb-2 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Tehlikeli Bölge</div>
               <p class="small text-secondary mb-3">Bu işlem geri alınamaz. Kullanıcının tüm verileri kalıcı olarak silinir.</p>
-              <form method="POST" action="/yonetici/kullanici/{{ ad }}/sil"
-                    onsubmit="return confirm('{{ ad }} kullanıcısı VE tüm verileri kalıcı olarak silinecek. ONAYLIYORSUNUZ?')">
-                <button type="submit" class="adm-btn-action adm-btn-danger">
-                  <i class="bi bi-trash3-fill me-2"></i>Hesabı Kalıcı Sil
-                </button>
-              </form>
+              <form method="POST" action="/yonetici/kullanici/{{ ad }}/sil" onsubmit="return confirm('{{ ad }} kullanıcısı VE tüm verileri kalıcı olarak silinecek. ONAYLIYORSUNUZ?')"><button type="submit" class="adm-btn-action adm-btn-danger"><i class="bi bi-trash3-fill me-2"></i>Hesabı Kalıcı Sil</button></form>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
-    <!-- Son Görevler -->
     {% if kullanici.get('gorevler') %}
     <div class="adm-section mt-4">
       <div class="adm-section-title mb-3"><i class="bi bi-check2-square me-2"></i>Görevler (son 10)</div>
@@ -178,13 +152,7 @@
             <tr>
               <td class="text-secondary small">{{ loop.index }}</td>
               <td>{{ g.get('baslik', '—') }}</td>
-              <td>
-                {% if g.get('tamamlandi') %}
-                  <span class="adm-badge-status adm-badge-green">Tamamlandı</span>
-                {% else %}
-                  <span class="adm-badge-status adm-badge-gray">Bekliyor</span>
-                {% endif %}
-              </td>
+              <td>{% if g.get('tamamlandi') %}<span class="adm-badge-status adm-badge-green">Tamamlandı</span>{% else %}<span class="adm-badge-status adm-badge-gray">Bekliyor</span>{% endif %}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -192,7 +160,6 @@
       </div>
     </div>
     {% endif %}
-
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
