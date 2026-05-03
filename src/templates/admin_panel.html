@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>JKB — Yönetici Paneli</title>
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body class="adm-body">
+
+  <!-- Sidebar -->
+  <aside class="adm-sidebar">
+    <div class="adm-sidebar-brand">
+      <div class="adm-brand-icon"><i class="bi bi-cpu-fill"></i></div>
+      <div>
+        <div class="adm-brand-title">JKB Admin</div>
+        <div class="adm-brand-sub">Kontrol Merkezi</div>
+      </div>
+    </div>
+    <nav class="adm-nav">
+      <a href="/yonetici/" class="adm-nav-item active">
+        <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+      </a>
+      <a href="/yonetici/ayarlar" class="adm-nav-item">
+        <i class="bi bi-gear-fill"></i> Uygulama Ayarları
+      </a>
+      <a href="/yonetici/veritabani" class="adm-nav-item" target="_blank">
+        <i class="bi bi-database-fill"></i> Ham Veritabanı
+      </a>
+    </nav>
+    <div class="adm-sidebar-footer">
+      <div class="small text-secondary mb-1">Giriş: {{ giris_zamani[:16] if giris_zamani != '—' else '—' }}</div>
+      <a href="/yonetici/cikis" class="adm-logout-btn">
+        <i class="bi bi-box-arrow-right"></i> Çıkış
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="adm-main">
+
+    <!-- Top Bar -->
+    <div class="adm-topbar">
+      <div>
+        <h1 class="adm-page-title">Dashboard</h1>
+        <div class="adm-page-sub">Genel bakış ve kullanıcı yönetimi</div>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <span class="adm-online-badge"><span class="adm-dot"></span> Aktif</span>
+      </div>
+    </div>
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show mx-0 mb-3" role="alert">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Stat Cards -->
+    <div class="adm-stat-grid">
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(99,102,241,0.15);color:#a5b4fc">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="adm-stat-val">{{ toplam_kullanici }}</div>
+        <div class="adm-stat-lbl">Toplam Kullanıcı</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(34,197,94,0.15);color:#86efac">
+          <i class="bi bi-check2-square"></i>
+        </div>
+        <div class="adm-stat-val">{{ toplam_gorev }}</div>
+        <div class="adm-stat-lbl">Toplam Görev
+          <span class="adm-mini-badge">{{ tamamlanan_gorev }} tamamlandı</span>
+        </div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(251,191,36,0.15);color:#fde68a">
+          <i class="bi bi-activity"></i>
+        </div>
+        <div class="adm-stat-val">{{ toplam_fitness }}</div>
+        <div class="adm-stat-lbl">Fitness Kaydı</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(239,68,68,0.15);color:#fca5a5">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <div class="adm-stat-val">{{ toplam_antrenman }}</div>
+        <div class="adm-stat-lbl">Toplam Antrenman</div>
+      </div>
+      <div class="adm-stat-card">
+        <div class="adm-stat-icon" style="background:rgba(14,165,233,0.15);color:#7dd3fc">
+          <i class="bi bi-database"></i>
+        </div>
+        <div class="adm-stat-val">{{ "%.1f"|format(db_boyutu / 1024) }} KB</div>
+        <div class="adm-stat-lbl">Veritabanı Boyutu</div>
+      </div>
+    </div>
+
+    <!-- Kullanıcı Tablosu -->
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <div>
+          <div class="adm-section-title"><i class="bi bi-people me-2"></i>Kullanıcılar</div>
+          <div class="adm-section-sub">{{ toplam_kullanici }} kayıtlı hesap</div>
+        </div>
+        <input type="text" id="kullaniciAra" class="adm-search" placeholder="Kullanıcı ara..." oninput="kullaniciAra(this.value)">
+      </div>
+      <div class="table-responsive">
+        <table class="adm-table" id="kullaniciTablosu">
+          <thead>
+            <tr>
+              <th>Kullanıcı Adı</th>
+              <th>E-posta</th>
+              <th>Görev</th>
+              <th>Fitness</th>
+              <th>Antrenman</th>
+              <th>Hedef</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in kullanici_ozet %}
+            <tr class="kullanici-satir">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="adm-avatar">{{ u.ad[0].upper() }}</div>
+                  <span class="fw-semibold">{{ u.ad }}</span>
+                </div>
+              </td>
+              <td class="text-secondary small">{{ u.eposta }}</td>
+              <td>
+                <span class="adm-badge-sm">{{ u.gorev_sayisi }}</span>
+              </td>
+              <td><span class="adm-badge-sm">{{ u.fitness_kayit }}</span></td>
+              <td><span class="adm-badge-sm">{{ u.antrenman }}</span></td>
+              <td class="small text-secondary">{{ u.hedef }}</td>
+              <td>
+                <a href="/yonetici/kullanici/{{ u.ad }}" class="adm-btn-sm adm-btn-primary">
+                  <i class="bi bi-pencil-square"></i> Yönet
+                </a>
+                <form method="POST" action="/yonetici/kullanici/{{ u.ad }}/sil"
+                      style="display:inline"
+                      onsubmit="return confirm('{{ u.ad }} kullanıcısını silmek istediğinize emin misiniz?')">
+                  <button type="submit" class="adm-btn-sm adm-btn-danger">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-secondary py-4">Henüz kullanıcı yok.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function kullaniciAra(q) {
+      const rows = document.querySelectorAll('#kullaniciTablosu .kullanici-satir');
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
