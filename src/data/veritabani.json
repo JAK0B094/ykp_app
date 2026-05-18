@@ -1,7 +1,7 @@
 {
   "kullanicilar": {
     "ykp": {
-      "sifre": "949494",
+      "sifre": "ddba9a9dfda18dce9ee5cb51f41d0a5f$a9e248100c581c70ae65d650c76fd6ef8c0619fc8574ad8f6edb3e6e9faee8e9",
       "eposta": "yakup.picak@gmail.com",
       "gorevler": [
         {
@@ -79,8 +79,8 @@
       "durum": "aktif",
       "kilitli": false,
       "kayit_tarihi": "2026-05-18 05:01:14",
-      "son_giris": "",
-      "giris_sayaci": 0,
+      "son_giris": "2026-05-18 05:29:52",
+      "giris_sayaci": 1,
       "admin_notu": ""
     }
   },
@@ -104,6 +104,20 @@
       "olay": "Başarısız Giriş",
       "detay": "'ykp' için giriş başarısız: Şifre hatalı!",
       "seviye": "uyari",
+      "kullanici": "ykp"
+    },
+    {
+      "zaman": "2026-05-18 05:29:52",
+      "olay": "Giriş",
+      "detay": "'ykp' giriş yaptı",
+      "seviye": "basari",
+      "kullanici": "ykp"
+    },
+    {
+      "zaman": "2026-05-18 05:29:52",
+      "olay": "Kullanıcı Girişi",
+      "detay": "'ykp' başarıyla giriş yaptı.",
+      "seviye": "bilgi",
       "kullanici": "ykp"
     }
   ]
