@@ -186,21 +186,34 @@ class KimlikDogrulama:
                 if kullanici_adi not in kullanicilar:
                     return False, "Kullanıcı bulunamadı!"
                 k = kullanicilar[kullanici_adi]
+                simdiki = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                data.setdefault("sistem_log", [])
+
                 if k.get("kilitli", False):
+                    data["sistem_log"].append({"zaman": simdiki, "olay": "Giriş Engellendi", "detay": f"'{kullanici_adi}' kilitli hesap", "seviye": "uyari", "kullanici": kullanici_adi})
+                    data["sistem_log"] = data["sistem_log"][-500:]
+                    self._guvensiz_yaz(data)
                     return False, "Bu hesap kilitlenmiştir. Yöneticiye başvurun."
                 if k.get("durum", "aktif") == "pasif":
+                    data["sistem_log"].append({"zaman": simdiki, "olay": "Giriş Engellendi", "detay": f"'{kullanici_adi}' pasif hesap", "seviye": "uyari", "kullanici": kullanici_adi})
+                    data["sistem_log"] = data["sistem_log"][-500:]
+                    self._guvensiz_yaz(data)
                     return False, "Bu hesap askıya alınmıştır."
                 kayitli_sifre = str(k.get("sifre", ""))
                 if not _sifre_dogrula(sifre, kayitli_sifre):
+                    data["sistem_log"].append({"zaman": simdiki, "olay": "Giriş Başarısız", "detay": f"'{kullanici_adi}' hatalı şifre", "seviye": "uyari", "kullanici": kullanici_adi})
+                    data["sistem_log"] = data["sistem_log"][-500:]
+                    self._guvensiz_yaz(data)
                     return False, "Şifre hatalı!"
                 # Düz metin ise şeffaf migration: hash'e çevir
                 if "$" not in kayitli_sifre:
                     kullanicilar[kullanici_adi]["sifre"] = _sifre_hashle(sifre)
                 # Son giriş ve sayaç güncelle
-                simdiki = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 kullanicilar[kullanici_adi]["son_giris"] = simdiki
                 kullanicilar[kullanici_adi]["giris_sayaci"] = k.get("giris_sayaci", 0) + 1
                 data["kullanicilar"] = kullanicilar
+                data["sistem_log"].append({"zaman": simdiki, "olay": "Giriş", "detay": f"'{kullanici_adi}' giriş yaptı", "seviye": "basari", "kullanici": kullanici_adi})
+                data["sistem_log"] = data["sistem_log"][-500:]
                 self._guvensiz_yaz(data)
                 return True, "Giriş başarılı!"
         except Exception as e:
@@ -343,6 +356,48 @@ class KimlikDogrulama:
             self._kullanici_guncelle(kullanici_adi, "gorevler", gorevler)
         except Exception as e:
             raise IOError(f"Görevler kaydedilemedi: {e}")
+
+    def gorev_ekle_atomik(self, kullanici_adi, yeni_gorev):
+        """Tek kilit altında oku-ekle-yaz. Race condition önler."""
+        with _dosya_kilidi:
+            try:
+                with open(self.dosya_yolu, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                data = {"kullanicilar": {}, "sistem_log": []}
+            if kullanici_adi not in data.get("kullanicilar", {}):
+                raise KeyError(f"Kullanıcı bulunamadı: {kullanici_adi}")
+            data["kullanicilar"][kullanici_adi].setdefault("gorevler", []).append(yeni_gorev)
+            self._guvensiz_yaz(data)
+
+    def gorev_durum_degistir_atomik(self, kullanici_adi, gorev_id):
+        """Tek kilit altında oku-değiştir-yaz."""
+        with _dosya_kilidi:
+            try:
+                with open(self.dosya_yolu, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                return
+            liste = data.get("kullanicilar", {}).get(kullanici_adi, {}).get("gorevler", [])
+            for g in liste:
+                if g.get("id") == gorev_id:
+                    g["tamamlandi"] = not g.get("tamamlandi", False)
+                    break
+            if kullanici_adi in data.get("kullanicilar", {}):
+                data["kullanicilar"][kullanici_adi]["gorevler"] = liste
+            self._guvensiz_yaz(data)
+
+    def gorev_sil_atomik(self, kullanici_adi, gorev_id):
+        """Tek kilit altında oku-filtrele-yaz."""
+        with _dosya_kilidi:
+            try:
+                with open(self.dosya_yolu, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                return
+            liste = data.get("kullanicilar", {}).get(kullanici_adi, {}).get("gorevler", [])
+            data["kullanicilar"][kullanici_adi]["gorevler"] = [g for g in liste if g.get("id") != gorev_id]
+            self._guvensiz_yaz(data)
 
     def gorev_getir(self, kullanici_adi):
         try:

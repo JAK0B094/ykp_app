@@ -1,6 +1,6 @@
 import uuid
 import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, session, abort
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from src.data.kimlik_dogrulama import KimlikDogrulama
 from src.routes.utils import giris_gerekli
 
@@ -20,33 +20,34 @@ def gorev_sayfasi():
 def gorev_ekle():
     baslik = request.form.get("baslik", "").strip()
     if baslik:
-        liste = db.gorev_getir(session["kullanici"])
-        liste.append({
+        yeni = {
             "id": str(uuid.uuid4())[:8],
             "baslik": baslik[:200],
             "tamamlandi": False,
             "tarih": datetime.date.today().isoformat(),
-        })
-        db.gorev_kaydet(session["kullanici"], liste)
+        }
+        try:
+            db.gorev_ekle_atomik(session["kullanici"], yeni)
+        except Exception as e:
+            db.sistem_log_ekle("Görev Hatası", f"Ekleme başarısız: {e}", "hata", session["kullanici"])
     return redirect(url_for("gorevler.gorev_sayfasi"))
 
 
 @gorevler.route("/gorevler/durum/<gorev_id>", methods=["POST"])
 @giris_gerekli
 def gorev_durum(gorev_id):
-    liste = db.gorev_getir(session["kullanici"])
-    for g in liste:
-        if g["id"] == gorev_id:
-            g["tamamlandi"] = not g["tamamlandi"]
-            break
-    db.gorev_kaydet(session["kullanici"], liste)
+    try:
+        db.gorev_durum_degistir_atomik(session["kullanici"], gorev_id)
+    except Exception as e:
+        db.sistem_log_ekle("Görev Hatası", f"Durum güncellenemedi ({gorev_id}): {e}", "hata", session["kullanici"])
     return redirect(url_for("gorevler.gorev_sayfasi"))
 
 
 @gorevler.route("/gorevler/sil/<gorev_id>", methods=["POST"])
 @giris_gerekli
 def gorev_sil(gorev_id):
-    liste = db.gorev_getir(session["kullanici"])
-    liste = [g for g in liste if g["id"] != gorev_id]
-    db.gorev_kaydet(session["kullanici"], liste)
+    try:
+        db.gorev_sil_atomik(session["kullanici"], gorev_id)
+    except Exception as e:
+        db.sistem_log_ekle("Görev Hatası", f"Silme başarısız ({gorev_id}): {e}", "hata", session["kullanici"])
     return redirect(url_for("gorevler.gorev_sayfasi"))
