@@ -24,6 +24,10 @@ app.register_blueprint(notlar)
 app.register_blueprint(admin_bp)
 app.register_blueprint(moderator_bp)
 
+# Bakım modu cache — her 30 saniyede bir DB'ye gidilir
+_bakim_cache = {"aktif": False, "duyuru": "", "son_kontrol": 0.0}
+_BAKIM_CACHE_TTL = 30  # saniye
+
 
 @app.context_processor
 def inject_site_konfig():
@@ -37,18 +41,24 @@ def inject_site_konfig():
 
 @app.before_request
 def bakim_modu_kontrol():
-    """Bakım modunda yönetici dışındaki tüm istekleri engelle."""
+    """Bakım modunda yönetici dışındaki tüm istekleri engelle. Cache ile verimli."""
     if request.path.startswith("/yonetici") or request.path.startswith("/static"):
         return
-    try:
-        from src.data.veri_yoneticisi import VeriYoneticisi
-        db = VeriYoneticisi()
-        ayarlar = db.veri_oku().get("uygulama_ayarlari", {})
-        if ayarlar.get("bakim_modu", False):
-            duyuru = ayarlar.get("duyuru", "")
-            return render_template("bakim.html", duyuru=duyuru), 503
-    except Exception:
-        pass
+    import time
+    global _bakim_cache
+    simdi = time.time()
+    if simdi - _bakim_cache["son_kontrol"] > _BAKIM_CACHE_TTL:
+        try:
+            from src.data.veri_yoneticisi import VeriYoneticisi
+            db = VeriYoneticisi()
+            ayarlar = db.veri_oku().get("uygulama_ayarlari", {})
+            _bakim_cache["aktif"] = ayarlar.get("bakim_modu", False)
+            _bakim_cache["duyuru"] = ayarlar.get("duyuru", "")
+            _bakim_cache["son_kontrol"] = simdi
+        except Exception:
+            _bakim_cache["son_kontrol"] = simdi
+    if _bakim_cache["aktif"]:
+        return render_template("bakim.html", duyuru=_bakim_cache["duyuru"]), 503
 
 
 @app.route("/")

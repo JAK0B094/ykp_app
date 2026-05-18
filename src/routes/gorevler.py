@@ -1,8 +1,8 @@
 import uuid
 import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, abort
 from src.data.kimlik_dogrulama import KimlikDogrulama
-from src.routes.panel import giris_gerekli
+from src.routes.utils import giris_gerekli
 
 gorevler = Blueprint("gorevler", __name__)
 db = KimlikDogrulama()
@@ -23,7 +23,7 @@ def gorev_ekle():
         liste = db.gorev_getir(session["kullanici"])
         liste.append({
             "id": str(uuid.uuid4())[:8],
-            "baslik": baslik,
+            "baslik": baslik[:200],
             "tamamlandi": False,
             "tarih": datetime.date.today().isoformat(),
         })
@@ -31,7 +31,7 @@ def gorev_ekle():
     return redirect(url_for("gorevler.gorev_sayfasi"))
 
 
-@gorevler.route("/gorevler/durum/<gorev_id>")
+@gorevler.route("/gorevler/durum/<gorev_id>", methods=["POST"])
 @giris_gerekli
 def gorev_durum(gorev_id):
     liste = db.gorev_getir(session["kullanici"])
@@ -43,7 +43,7 @@ def gorev_durum(gorev_id):
     return redirect(url_for("gorevler.gorev_sayfasi"))
 
 
-@gorevler.route("/gorevler/sil/<gorev_id>")
+@gorevler.route("/gorevler/sil/<gorev_id>", methods=["POST"])
 @giris_gerekli
 def gorev_sil(gorev_id):
     liste = db.gorev_getir(session["kullanici"])

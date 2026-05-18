@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from src.data.kimlik_dogrulama import KimlikDogrulama
-from src.routes.panel import giris_gerekli
+from src.routes.utils import giris_gerekli
 
 notlar = Blueprint("notlar", __name__)
 db = KimlikDogrulama()

@@ -1,5 +1,7 @@
+import hashlib
 import json
 import os
+import secrets
 import threading
 import tempfile
 import shutil
@@ -9,6 +11,25 @@ import datetime
 # Uygulama genelinde tek bir kilit — çoklu kullanıcı/thread güvenliği
 _dosya_kilidi = threading.Lock()
 
+# ── Şifre Yardımcıları ─────────────────────────────────────────────────────────
+
+def _sifre_hashle(sifre: str) -> str:
+    """SHA-256 + rastgele salt ile şifre hashle. Format: salt$hash"""
+    salt = secrets.token_hex(16)
+    h = hashlib.sha256(f"{salt}{sifre}".encode("utf-8")).hexdigest()
+    return f"{salt}${h}"
+
+
+def _sifre_dogrula(sifre: str, kayitli: str) -> bool:
+    """Kaydedilmiş hash ile girilen şifreyi doğrula. Düz metin geçişi de destekler."""
+    if "$" in kayitli:
+        salt, h = kayitli.split("$", 1)
+        return hashlib.sha256(f"{salt}{sifre}".encode("utf-8")).hexdigest() == h
+    # Eski düz metin şifre — doğrudan karşılaştır (sonra hash'e geçirilecek)
+    return str(kayitli) == str(sifre)
+
+
+# ── KimlikDogrulama Sınıfı ─────────────────────────────────────────────────────
 
 class KimlikDogrulama:
     def __init__(self, dosya_yolu="src/data/veritabani.json"):
@@ -16,7 +37,7 @@ class KimlikDogrulama:
         self._baslangic_kontrol()
 
     def _baslangic_kontrol(self):
-        """Veritabanı dosyası yoksa oluştur, bozuksa yedekten kurtar."""
+        """Veritabanı dosyası yoksa oluştur, bozuksa yedekten kurtar. Eksik alanları tamamla."""
         try:
             klasor = os.path.dirname(self.dosya_yolu)
             if klasor and not os.path.exists(klasor):
@@ -25,7 +46,34 @@ class KimlikDogrulama:
                 self._guvensiz_yaz({"kullanicilar": {}, "sistem_log": []})
             else:
                 with open(self.dosya_yolu, "r", encoding="utf-8") as f:
-                    json.load(f)
+                    data = json.load(f)
+                # Mevcut kullanıcılarda eksik alanları tamamla (migration)
+                degisti = False
+                simdiki = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                for k_adi, v in data.get("kullanicilar", {}).items():
+                    if "kayit_tarihi" not in v:
+                        v["kayit_tarihi"] = simdiki
+                        degisti = True
+                    if "son_giris" not in v:
+                        v["son_giris"] = ""
+                        degisti = True
+                    if "giris_sayaci" not in v:
+                        v["giris_sayaci"] = 0
+                        degisti = True
+                    if "durum" not in v:
+                        v["durum"] = "aktif"
+                        degisti = True
+                    if "kilitli" not in v:
+                        v["kilitli"] = False
+                        degisti = True
+                    if "admin_notu" not in v:
+                        v["admin_notu"] = ""
+                        degisti = True
+                    if "rol" not in v:
+                        v["rol"] = "user"
+                        degisti = True
+                if degisti:
+                    self._guvensiz_yaz(data)
         except (json.JSONDecodeError, Exception):
             yedek = self.dosya_yolu + ".bak"
             try:
@@ -105,7 +153,7 @@ class KimlikDogrulama:
                 "zaman": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "olay": olay,
                 "detay": detay[:300],
-                "seviye": seviye,       # bilgi / uyari / hata / basari
+                "seviye": seviye,
                 "kullanici": kullanici,
             }
             data["sistem_log"].append(giris)
@@ -138,18 +186,19 @@ class KimlikDogrulama:
                 if kullanici_adi not in kullanicilar:
                     return False, "Kullanıcı bulunamadı!"
                 k = kullanicilar[kullanici_adi]
-                # Kilitli kontrolü
                 if k.get("kilitli", False):
                     return False, "Bu hesap kilitlenmiştir. Yöneticiye başvurun."
-                # Durum kontrolü
                 if k.get("durum", "aktif") == "pasif":
                     return False, "Bu hesap askıya alınmıştır."
-                # Şifre kontrolü
-                if str(k.get("sifre", "")) != str(sifre):
+                kayitli_sifre = str(k.get("sifre", ""))
+                if not _sifre_dogrula(sifre, kayitli_sifre):
                     return False, "Şifre hatalı!"
-                # Başarılı giriş: son_giris ve giris_sayaci güncelle
-                simdiki_zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                kullanicilar[kullanici_adi]["son_giris"] = simdiki_zaman
+                # Düz metin ise şeffaf migration: hash'e çevir
+                if "$" not in kayitli_sifre:
+                    kullanicilar[kullanici_adi]["sifre"] = _sifre_hashle(sifre)
+                # Son giriş ve sayaç güncelle
+                simdiki = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                kullanicilar[kullanici_adi]["son_giris"] = simdiki
                 kullanicilar[kullanici_adi]["giris_sayaci"] = k.get("giris_sayaci", 0) + 1
                 data["kullanicilar"] = kullanicilar
                 self._guvensiz_yaz(data)
@@ -185,32 +234,32 @@ class KimlikDogrulama:
                     if v.get("eposta", "").lower() == eposta:
                         return False, "Bu e-posta adresi zaten kayıtlı!"
 
-                simdiki_zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                simdiki = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 kullanicilar[kullanici_adi] = {
-                    "sifre": sifre,
-                    "eposta": eposta,
-                    "kayit_tarihi": simdiki_zaman,
-                    "son_giris": "",
-                    "giris_sayaci": 0,
-                    "durum": "aktif",
-                    "kilitli": False,
-                    "rol": "user",
-                    "fitness_gecmisi": [],
-                    "gorevler": [],
-                    "notlar": "",
-                    "fitness_profil": {},
-                    "antrenman_kayitlari": [],
-                    "su_kayitlari": {},
-                    "hatirlaticilar": [],
+                    "sifre":              _sifre_hashle(sifre),
+                    "eposta":             eposta,
+                    "kayit_tarihi":       simdiki,
+                    "son_giris":          "",
+                    "giris_sayaci":       0,
+                    "durum":              "aktif",
+                    "kilitli":            False,
+                    "rol":                "user",
+                    "admin_notu":         "",
+                    "fitness_gecmisi":    [],
+                    "gorevler":           [],
+                    "notlar":             "",
+                    "fitness_profil":     {},
+                    "antrenman_kayitlari":[],
+                    "su_kayitlari":       {},
+                    "hatirlaticilar":     [],
                 }
                 data["kullanicilar"] = kullanicilar
-                # Sistem log kaydı da aynı yazımda
                 data.setdefault("sistem_log", [])
                 data["sistem_log"].append({
-                    "zaman": simdiki_zaman,
-                    "olay": "Yeni Kayıt",
-                    "detay": f"'{kullanici_adi}' kayıt oldu — {eposta}",
-                    "seviye": "basari",
+                    "zaman":    simdiki,
+                    "olay":     "Yeni Kayıt",
+                    "detay":    f"'{kullanici_adi}' kayıt oldu — {eposta}",
+                    "seviye":   "basari",
                     "kullanici": kullanici_adi,
                 })
                 if len(data["sistem_log"]) > 500:
@@ -230,8 +279,10 @@ class KimlikDogrulama:
                     data = json.load(f)
                 for k, v in data["kullanicilar"].items():
                     if v.get("eposta", "").lower() == eposta:
-                        data["kullanicilar"][k]["sifre"] = yeni_sifre
-                        data["kullanicilar"][k]["sifre_degisim_tarihi"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        data["kullanicilar"][k]["sifre"] = _sifre_hashle(yeni_sifre)
+                        data["kullanicilar"][k]["sifre_degisim_tarihi"] = (
+                            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        )
                         self._guvensiz_yaz(data)
                         return True, "Şifre başarıyla güncellendi!"
             return False, "Bu e-posta ile kayıtlı kullanıcı bulunamadı!"
@@ -245,9 +296,11 @@ class KimlikDogrulama:
         if len(yeni_sifre) < 6 or len(yeni_sifre) > 32:
             return False, "Yeni şifre 6-32 karakter arasında olmalıdır!"
         try:
-            self._kullanici_guncelle(kullanici_adi, "sifre", yeni_sifre)
-            self._kullanici_guncelle(kullanici_adi, "sifre_degisim_tarihi",
-                                     datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            self._kullanici_guncelle(kullanici_adi, "sifre", _sifre_hashle(yeni_sifre))
+            self._kullanici_guncelle(
+                kullanici_adi, "sifre_degisim_tarihi",
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            )
             return True, "Şifre başarıyla değiştirildi!"
         except Exception as e:
             return False, f"Hata: {e}"

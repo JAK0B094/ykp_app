@@ -8,6 +8,7 @@ from functools import wraps
 from flask import (Blueprint, render_template, request, session,
                    redirect, url_for, flash, jsonify, send_file)
 from src.data.veri_yoneticisi import VeriYoneticisi
+from src.data.kimlik_dogrulama import _sifre_hashle
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/yonetici")
 db = VeriYoneticisi()
@@ -68,11 +69,27 @@ def save_site_konfig(konfig):
     db.veri_yaz(data)
 
 
+_ADMIN_SESSION_SURESI = 4 * 3600  # 4 saat (saniye)
+
+
 def admin_gerekli(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if not session.get("admin_giris"):
             return redirect(url_for("admin.admin_giris"))
+        # Session timeout kontrolü
+        giris_zamani = session.get("admin_giris_zamani")
+        if giris_zamani:
+            try:
+                giris_dt = datetime.datetime.strptime(giris_zamani, "%Y-%m-%d %H:%M:%S")
+                gecen = (datetime.datetime.now() - giris_dt).total_seconds()
+                if gecen > _ADMIN_SESSION_SURESI:
+                    session.pop("admin_giris", None)
+                    session.pop("admin_giris_zamani", None)
+                    flash("Oturum süresi doldu. Lütfen tekrar giriş yapın.", "warning")
+                    return redirect(url_for("admin.admin_giris"))
+            except Exception:
+                pass
         return f(*args, **kwargs)
     return decorated
 
@@ -390,7 +407,7 @@ def kullanici_sifre_sifirla(kullanici_adi):
     if kullanici_adi not in data.get("kullanicilar", {}):
         flash("Kullanıcı bulunamadı.", "danger")
         return redirect(url_for("admin.admin_panel"))
-    data["kullanicilar"][kullanici_adi]["sifre"] = yeni_sifre
+    data["kullanicilar"][kullanici_adi]["sifre"] = _sifre_hashle(yeni_sifre)
     data["kullanicilar"][kullanici_adi]["sifre_degisim_tarihi"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     _veri_yaz(data)
     db.sistem_log_ekle("Şifre Sıfırlandı (Admin)", f"'{kullanici_adi}' şifresi admin tarafından sıfırlandı.", seviye="uyari", kullanici="admin")

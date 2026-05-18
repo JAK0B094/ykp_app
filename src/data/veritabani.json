@@ -77,7 +77,11 @@
       "rol": "admin",
       "admin_token": "e6RPITZ0Q4VY69Ym",
       "durum": "aktif",
-      "kilitli": false
+      "kilitli": false,
+      "kayit_tarihi": "2026-05-18 05:01:14",
+      "son_giris": "",
+      "giris_sayaci": 0,
+      "admin_notu": ""
     }
   },
   "sistem_log": [

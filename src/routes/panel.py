@@ -1,23 +1,14 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
-from functools import wraps
+from src.data.kimlik_dogrulama import KimlikDogrulama
+from src.routes.utils import giris_gerekli
 
 panel = Blueprint("panel", __name__)
-
-
-def giris_gerekli(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if not session.get("kullanici"):
-            return redirect(url_for("auth.giris"))
-        return f(*args, **kwargs)
-    return decorated
+db = KimlikDogrulama()
 
 
 @panel.route("/panel")
 @giris_gerekli
 def ana_panel():
-    from src.data.kimlik_dogrulama import KimlikDogrulama
-    db = KimlikDogrulama()
     kullanici = session["kullanici"]
 
     gorevler = db.gorev_getir(kullanici)
@@ -30,7 +21,7 @@ def ana_panel():
     fitness_kayit = len(gecmis)
 
     notlar = db.not_getir(kullanici)
-    not_ozet = (notlar[:80] + "...") if len(notlar) > 80 else notlar
+    not_ozet = (notlar[:80] + "…") if len(notlar) > 80 else notlar
 
     return render_template(
         "panel.html",
@@ -47,8 +38,6 @@ def ana_panel():
 @panel.route("/profil")
 @giris_gerekli
 def profil():
-    from src.data.kimlik_dogrulama import KimlikDogrulama
-    db = KimlikDogrulama()
     kullanici = session["kullanici"]
     bilgi = db.kullanici_bilgi_getir(kullanici)
     return render_template("profil.html",
@@ -61,8 +50,6 @@ def profil():
 @panel.route("/profil/sifre", methods=["POST"])
 @giris_gerekli
 def sifre_degistir():
-    from src.data.kimlik_dogrulama import KimlikDogrulama
-    db = KimlikDogrulama()
     kullanici = session["kullanici"]
     bilgi = db.kullanici_bilgi_getir(kullanici)
 
@@ -86,8 +73,6 @@ def sifre_degistir():
 @panel.route("/profil/telefon", methods=["POST"])
 @giris_gerekli
 def telefon_guncelle():
-    from src.data.kimlik_dogrulama import KimlikDogrulama
-    db = KimlikDogrulama()
     kullanici = session["kullanici"]
     telefon = request.form.get("telefon", "").strip()
     db._kullanici_guncelle(kullanici, "telefon", telefon or "")

@@ -2,61 +2,59 @@
 {% block title %}Ana Panel{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 pt-hero">
   <h4 class="text-white mb-4">Hoş geldin, <strong>{{ kullanici }}</strong>!</h4>
 
-  <div class="row g-3">
+  <div class="row g-3 mb-4">
+
     <div class="col-6 col-md-3">
-      <div class="card bg-dark text-white border-secondary h-100">
-        <div class="card-body">
-          <div class="small text-muted">Görevler</div>
-          <div class="fs-3 fw-bold">{{ gorev_toplam }}</div>
+      <a href="/gorevler" class="text-decoration-none">
+        <div class="jkb-card h-100">
+          <div class="small text-muted mb-1"><i class="bi bi-check2-square me-1"></i>Görevler</div>
+          <div class="fs-3 fw-bold text-white">{{ gorev_toplam }}</div>
           <div class="small text-muted">{{ gorev_tamamlandi }} tamamlandı</div>
-          <a href="/gorevler" class="stretched-link"></a>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-6 col-md-3">
-      <div class="card bg-dark text-white border-secondary h-100">
-        <div class="card-body">
-          <div class="small text-muted">Son Kilo</div>
-          <div class="fs-3 fw-bold">{{ son_kilo or "—" }}</div>
-          <div class="small text-muted">{{ son_vki or "" }}</div>
-          <a href="/fitness" class="stretched-link"></a>
+      <a href="/fitness" class="text-decoration-none">
+        <div class="jkb-card h-100">
+          <div class="small text-muted mb-1"><i class="bi bi-person-fill me-1"></i>Son Kilo</div>
+          <div class="fs-3 fw-bold text-white">{{ son_kilo or "—" }}</div>
+          <div class="small text-muted">{{ son_vki or "kayıt yok" }}</div>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-6 col-md-3">
-      <div class="card bg-dark text-white border-secondary h-100">
-        <div class="card-body">
-          <div class="small text-muted">Fitness Kayıt</div>
-          <div class="fs-3 fw-bold">{{ fitness_kayit }}</div>
-          <div class="small text-muted">toplam</div>
-          <a href="/fitness" class="stretched-link"></a>
+      <a href="/fitness" class="text-decoration-none">
+        <div class="jkb-card h-100">
+          <div class="small text-muted mb-1"><i class="bi bi-activity me-1"></i>Fitness Kayıt</div>
+          <div class="fs-3 fw-bold text-white">{{ fitness_kayit }}</div>
+          <div class="small text-muted">toplam ölçüm</div>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-6 col-md-3">
-      <div class="card bg-dark text-white border-secondary h-100">
-        <div class="card-body">
-          <div class="small text-muted">Notlar</div>
-          <div class="small text-white mt-1" style="overflow:hidden;max-height:48px">
+      <a href="/notlar" class="text-decoration-none">
+        <div class="jkb-card h-100">
+          <div class="small text-muted mb-1"><i class="bi bi-journal-text me-1"></i>Notlar</div>
+          <div class="small text-white mt-1" style="overflow:hidden;max-height:48px;line-height:1.5">
             {{ not_ozet or "Henüz not yok." }}
           </div>
-          <a href="/notlar" class="stretched-link"></a>
         </div>
-      </div>
+      </a>
     </div>
+
   </div>
 
-  <div class="mt-4 d-flex flex-wrap gap-2">
-    <a href="/fitness"  class="btn btn-outline-light btn-sm">Fitness Koçu</a>
-    <a href="/gorevler" class="btn btn-outline-light btn-sm">Görevlerim</a>
-    <a href="/notlar"   class="btn btn-outline-light btn-sm">Notlarım</a>
-    <a href="/profil"   class="btn btn-outline-light btn-sm">Profilim</a>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="/fitness"  class="btn btn-outline-light btn-sm"><i class="bi bi-activity me-1"></i>Fitness Koçu</a>
+    <a href="/gorevler" class="btn btn-outline-light btn-sm"><i class="bi bi-check2-square me-1"></i>Görevlerim</a>
+    <a href="/notlar"   class="btn btn-outline-light btn-sm"><i class="bi bi-journal-text me-1"></i>Notlarım</a>
+    <a href="/profil"   class="btn btn-outline-light btn-sm"><i class="bi bi-person-circle me-1"></i>Profilim</a>
   </div>
 </div>
 {% endblock %}
