@@ -1343,6 +1343,106 @@ EGZERSIZ_DB = {
 }
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  EKİPMAN ALTERNATİFLERİ  (salon → ev → vücut ağırlığı)
+# ══════════════════════════════════════════════════════════════════════════════
+
+EKIPMAN_ALTERN = {
+    "Barbell Back Squat":        {"ev": "Goblet Squat",                  "vucutagirligi": "Bodyweight Squat"},
+    "Front Squat":               {"ev": "Goblet Squat",                  "vucutagirligi": "Bodyweight Squat"},
+    "Conventional Deadlift":     {"ev": "Romanian Deadlift (RDL)",       "vucutagirligi": "Single-Leg RDL"},
+    "Barbell Bench Press":       {"ev": "Dumbbell Bench Press",          "vucutagirligi": "Push-up"},
+    "Incline Barbell Press":     {"ev": "Incline Dumbbell Press",        "vucutagirligi": "Incline Push-up"},
+    "Barbell Overhead Press":    {"ev": "Dumbbell Shoulder Press",       "vucutagirligi": "Pike Push-up"},
+    "Bent-Over Barbell Row":     {"ev": "Dumbbell Row (One-Arm)",        "vucutagirligi": "Inverted Row"},
+    "Pull-up":                   {"ev": "Pull-up",                       "vucutagirligi": "Pull-up"},
+    "Lat Pulldown":              {"ev": "Dumbbell Row (One-Arm)",        "vucutagirligi": "Inverted Row"},
+    "Leg Press":                 {"ev": "Bulgarian Split Squat",         "vucutagirligi": "Lunge"},
+    "Hack Squat Machine":        {"ev": "Bulgarian Split Squat",         "vucutagirligi": "Bulgarian Split Squat"},
+    "Hip Thrust":                {"ev": "Hip Thrust",                    "vucutagirligi": "Glute Bridge"},
+    "Cable Fly (Mid)":           {"ev": "Dumbbell Fly",                  "vucutagirligi": "Push-up"},
+    "Seated Cable Row":          {"ev": "Dumbbell Row (One-Arm)",        "vucutagirligi": "Inverted Row"},
+    "Tricep Pushdown":           {"ev": "Overhead Tricep Extension",     "vucutagirligi": "Diamond Push-up"},
+    "Skull Crusher":             {"ev": "Overhead Tricep Extension",     "vucutagirligi": "Diamond Push-up"},
+    "Close-Grip Bench Press":    {"ev": "Overhead Tricep Extension",     "vucutagirligi": "Diamond Push-up"},
+    "Leg Extension":             {"ev": "Bulgarian Split Squat",         "vucutagirligi": "Wall Sit"},
+    "Lying Leg Curl":            {"ev": "Romanian Deadlift (RDL)",       "vucutagirligi": "Nordic Hamstring Curl"},
+    "Seated Leg Curl":           {"ev": "Romanian Deadlift (RDL)",       "vucutagirligi": "Nordic Hamstring Curl"},
+    "Cable Crunch":              {"ev": "Ab Wheel Rollout",              "vucutagirligi": "Plank"},
+    "Arnold Press":              {"ev": "Arnold Press",                  "vucutagirligi": "Pike Push-up"},
+    "Face Pull":                 {"ev": "Band Pull-Apart",               "vucutagirligi": "Band Pull-Apart"},
+    "Pallof Press":              {"ev": "Dead Bug",                      "vucutagirligi": "Dead Bug"},
+    "Good Morning":              {"ev": "Romanian Deadlift (RDL)",       "vucutagirligi": "Hip Hinge (Vücut)"},
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  A/B HAFTALIK VARİYASYON  (çift haftalarda B egzersizi)
+# ══════════════════════════════════════════════════════════════════════════════
+
+AB_VARYANT = {
+    "Barbell Back Squat":        "Bulgarian Split Squat",
+    "Barbell Bench Press":       "Incline Dumbbell Press",
+    "Conventional Deadlift":     "Romanian Deadlift (RDL)",
+    "Bent-Over Barbell Row":     "Seated Cable Row",
+    "Pull-up":                   "Lat Pulldown",
+    "Dumbbell Shoulder Press":   "Barbell Overhead Press",
+    "Barbell Overhead Press":    "Arnold Press",
+    "Lying Leg Curl":            "Seated Leg Curl",
+    "Leg Press":                 "Hack Squat Machine",
+    "Hip Thrust":                "Romanian Deadlift (RDL)",
+    "Cable Fly (Mid)":           "Dumbbell Fly",
+    "Tricep Pushdown":           "Overhead Tricep Extension",
+    "Barbell Curl":              "Incline Dumbbell Curl",
+    "Goblet Squat":              "Lunge",
+    "Plank":                     "Dead Bug",
+    "Kettlebell Swing":          "Romanian Deadlift (RDL)",
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SEVİYE ALTERNATİFLERİ  (başlangıç için ileri egzersizleri basitleştir)
+# ══════════════════════════════════════════════════════════════════════════════
+
+SEVIYE_ALTERN = {
+    "baslangic": {
+        "Conventional Deadlift":  "Romanian Deadlift (RDL)",
+        "Pull-up":                "Lat Pulldown",
+        "Ab Wheel Rollout":       "Plank",
+        "Nordic Hamstring Curl":  "Lying Leg Curl",
+        "Bulgarian Split Squat":  "Lunge",
+        "Pallof Press":           "Dead Bug",
+        "Good Morning":           "Romanian Deadlift (RDL)",
+        "Push Press":             "Dumbbell Shoulder Press",
+    }
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SET/TEKRAR ŞEMASİ  (seviyeye göre compound hareketler için)
+# ══════════════════════════════════════════════════════════════════════════════
+
+SEMA = {
+    "hipertrofi": {
+        "baslangic": ("3×10-12", "90 sn",  "Kontrollü tempo, tekniğe odaklan"),
+        "orta":      ("4×8-10",  "90 sn",  "Progressive overload"),
+        "ileri":     ("4×6-8",   "2 dk",   "RIR 1-2, neredeyse başarısızlık"),
+    },
+    "yakma": {
+        "baslangic": ("3×12",    "75 sn",  "Kontrollü eccentric, form önce"),
+        "orta":      ("4×12",    "45 sn",  "Süperset yapılabilir"),
+        "ileri":     ("4×15",    "30 sn",  "Maks hız, metabolik baskı"),
+    },
+    "kardiyo": {
+        "baslangic": ("3×12",    "60 sn",  "Tempoyu koru, nefes kontrolü"),
+        "orta":      ("3×15",    "45 sn",  "Devre tarzı, kısa mola"),
+        "ileri":     ("4×20",    "20 sn",  "HIIT yapısı, patlayıcı tempo"),
+    },
+    "powerbuilding": {
+        "baslangic": ("3×8",     "2 dk",   "Teknikle kuvveti birleştir"),
+        "orta":      ("4×6",     "2-3 dk", "Güç + hacim hibrid"),
+        "ileri":     ("5×4-5",   "3 dk",   "Ağır güç seti + hacim"),
+    },
+}
+
+
 class FitnessZekasi:
 
     @staticmethod
@@ -1482,6 +1582,42 @@ class FitnessZekasi:
         return 5
 
     @staticmethod
+    def _egzersiz_sec(ad, ekp, sev="orta"):
+        if sev == "baslangic":
+            ad = SEVIYE_ALTERN["baslangic"].get(ad, ad)
+        if ekp == "salon":
+            return ad
+        alt = EKIPMAN_ALTERN.get(ad, {})
+        return alt.get(ekp, ad)
+
+    @staticmethod
+    def _ab_sec(ad, hafta, ekp, sev="orta"):
+        if hafta % 2 == 0:
+            ad = AB_VARYANT.get(ad, ad)
+        return FitnessZekasi._egzersiz_sec(ad, ekp, sev)
+
+    @staticmethod
+    def _uygula_filtro(splits, hafta, ekp, sev, sema_turu=None):
+        sr, din = None, None
+        if sema_turu and sema_turu in SEMA:
+            sr, din, _ = SEMA[sema_turu][sev]
+        for g in splits:
+            processed = []
+            for e in g["egzersizler"]:
+                nome = FitnessZekasi._ab_sec(e[0], hafta, ekp, sev)
+                if sr is not None:
+                    tip = EGZERSIZ_DB.get(nome, EGZERSIZ_DB.get(e[0], {})).get("tip", "")
+                    if tip == "primer":
+                        e = (nome, sr, din) + e[3:]
+                    else:
+                        e = (nome,) + e[1:]
+                else:
+                    e = (nome,) + e[1:]
+                processed.append(e)
+            g["egzersizler"] = processed
+        return splits
+
+    @staticmethod
     def program_olustur(hedef, seviye_str, ekipman_str, gun_sayisi_str, hafta):
         sev = FitnessZekasi._seviye_kodu(seviye_str)
         ekp = FitnessZekasi._ekipman_kodu(ekipman_str)
@@ -1546,6 +1682,7 @@ class FitnessZekasi:
                 {"gun_adi": "Perşembe — Alt Vücut B", "egzersizler": gA},
                 {"gun_adi": "Cuma — Üst Vücut B + Core", "egzersizler": gB},
             ][:gun]
+        splits = FitnessZekasi._uygula_filtro(splits, hafta, ekp, sev, "yakma")
         return {
             "ad": f"Yağ Yakma — {faz} (Hafta {hafta})",
             "gunler": f"Haftada {gun} gün · Kısa mola · Yüksek tekrar",
@@ -1647,6 +1784,7 @@ class FitnessZekasi:
                 {"gun_adi": "Cuma — Pull B", "egzersizler": pull},
                 {"gun_adi": "Cumartesi — Legs B", "egzersizler": legs},
             ][:gun]
+        splits = FitnessZekasi._uygula_filtro(splits, hafta, ekp, sev, "hipertrofi")
         return {
             "ad": f"{'Vücut Geliştirme' if hedef_str=='Vücut Geliştirme' else 'Kas Hipertrofisi'} — Blok {blok} (Hafta {hafta})",
             "gunler": f"{'Upper/Lower 4 gün' if gun==4 else ('PPL '+str(gun)+' gün' if gun>=5 else 'Full Body 3 gün')}",
@@ -1678,6 +1816,7 @@ class FitnessZekasi:
             5: ["Pazartesi — Max Effort Squat", "Salı — Max Effort Bench", "Perşembe — Dynamic Effort DL", "Cuma — DE Bench", "Cumartesi — Yardımcı"],
         }
         splits = [{"gun_adi": gunler.get(gun, gunler[3])[i], "egzersizler": temel} for i in range(min(gun, len(gunler.get(gun, gunler[3]))))]
+        splits = FitnessZekasi._uygula_filtro(splits, hafta, ekp, sev)
         return {
             "ad": f"Kuvvet Periodizasyon — Blok {blok} ({yuzde}% 1RM, Hafta {hafta})",
             "gunler": f"Haftada {gun} gün · Yüksek yoğunluk · Uzun mola",
@@ -1725,6 +1864,7 @@ class FitnessZekasi:
                 ("Ab Wheel Rollout + Pallof Press + Side Plank", "3 tur", "30 sn", "Core", ""),
             ]},
         ]
+        splits = FitnessZekasi._uygula_filtro(splits, hafta, ekp, sev, "powerbuilding")
         return {
             "ad": f"Powerbuilding — Blok {blok} (Hafta {hafta})",
             "gunler": f"Haftada {min(gun,4)} gün · Güç + Hacim Hibrid",
@@ -1745,9 +1885,10 @@ class FitnessZekasi:
             ("Goblet Squat", "3 × 15", "20 sn", "Quadriceps, Glute", "Derin"),
             ("Farmer's Walk", "3 × 30 adım", "45 sn", "Trap, Core, Grip", "Dik dur"),
             ("Plank", "3 × 45 sn", "20 sn", "Core stabilizasyon", ""),
-            ("Barbell Back Squat veya Lunge", "3 × 12", "45 sn", "Quadriceps, Glute", "Tempo kontrol"),
+            ("Lunge", "3 × 12", "45 sn", "Quadriceps, Glute", "Tempo kontrol"),
         ]
         splits = [{"gun_adi": f"Gün {i+1} — Dayanıklılık Devresi ({faz})", "egzersizler": devre} for i in range(min(gun, 5))]
+        splits = FitnessZekasi._uygula_filtro(splits, hafta, ekp, sev, "kardiyo")
         return {
             "ad": f"Kardiyo & Dayanıklılık — {faz} (Hafta {hafta})",
             "gunler": f"Haftada {gun} gün · Devre antrenmanı + LISS",
@@ -1771,6 +1912,7 @@ class FitnessZekasi:
             ("Lateral Raise + Face Pull", "3 × 15", "30 sn", "Omuz dengesi", ""),
         ]
         splits = [{"gun_adi": f"Full Body {['A','B','C'][i%3]} — Genel Fitness", "egzersizler": liste} for i in range(gun)]
+        splits = FitnessZekasi._uygula_filtro(splits, hafta, ekp, sev, "hipertrofi")
         return {
             "ad": f"Fit Kal — Genel Sağlık (Hafta {hafta})",
             "gunler": f"Haftada {gun} gün Full Body",
